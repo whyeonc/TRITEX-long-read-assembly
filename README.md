@@ -130,7 +130,7 @@ The project folder should have the following subdirectory structure. At the star
 
    reads='hifi_reads.txt'
    prefix='project_name'
-   threads=30 ①
+   threads=30   #Set the number of threads you would like to use.
    
    mkdir $prefix
    out=$prefix/$prefix
@@ -138,7 +138,6 @@ The project folder should have the following subdirectory structure. At the star
    xargs -a $reads hifiasm -t $threads -o $out > $out.out 2> $out.err
    ```
 
-> **①** Set the number of threads you would like to use.
 
 3. Check the stats of contigs and unitigs.
 
@@ -146,22 +145,22 @@ The project folder should have the following subdirectory structure. At the star
    cd $projectdir/assembly/project_name/
 
    grep '^S' project_name.p_ctg.noseq.gfa | cut -f 4 | cut -d : -f 1,3 \
-    | tr : '\t' | $bitbucket/shell/n50 > project_name.p_ctg.noseq.gfa.n50 ①
+    | tr : '\t' | $bitbucket/shell/n50 > project_name.p_ctg.noseq.gfa.n50
 
    grep '^S' project_name.p_utg.noseq.gfa | cut -f 4 | cut -d : -f 1,3 \
    | tr : '\t' | $bitbucket/shell/n50 > project_name.p_utg.noseq.n50
    ```
 
-> **①** The backslash \ will be used throughout the tutorial to break long shell commands into several lines. When pasting the commands or editing them, make sure that no white space follows the backslash. Otherwise, the shell will interpret the lines as belonging to different commands. Also multi-line commands do not tolerate intervening command line (starting with the hash sign #).
+> The backslash \ will be used throughout the tutorial to break long shell commands into several lines. When pasting the commands or editing them, make sure that no white space follows the backslash. Otherwise, the shell will interpret the lines as belonging to different commands. Also multi-line commands do not tolerate intervening command line (starting with the hash sign #).
 
 4. Convert contig GFA to FASTA and change contig names.
 
    ```
    gfa='project_name.p_ctg.gfa'
-   gfatools gfa2fa $gfa | seqtk rename - contig_ > ${gfa:r}.fa ①
+   gfatools gfa2fa $gfa | seqtk rename - contig_ > ${gfa:r}.fa
    ```
 
- > **①** The syntax `${gfa:r}` is specific to the Z shell, see the section of the shell manual on [expansion and substitution](https://linux.die.net/man/1/zshexpn). Very usefyl are `:r` and `:t` modifiers to remove filename extensions and leading pathname components, respectively. The latter works like the UNIX command `basename`.
+ > The syntax `${gfa:r}` is specific to the Z shell, see the section of the shell manual on [expansion and substitution](https://linux.die.net/man/1/zshexpn). Very usefyl are `:r` and `:t` modifiers to remove filename extensions and leading pathname components, respectively. The latter works like the UNIX command `basename`.
 
 ## 2. Mapping Hi-C data
 
@@ -169,16 +168,14 @@ The project folder should have the following subdirectory structure. At the star
 
    ```
    cd $projectdir/assembly/project_name/
-   ref='$projectdir/assembly/project_name/project_name.p_ctg.fa' ①
+   ref='$projectdir/assembly/project_name/project_name.p_ctg.fa'  #renamed FASTA created in the previous step
 
-   $bitbucket/shell/digest_emboss.zsh --ref $ref --enzyme 'MboI' --sitelen 4 --minlen 30  ② ③
+   $bitbucket/shell/digest_emboss.zsh --ref $ref --enzyme 'MboI' --sitelen 4 --minlen 30 
    ```
 
-> **①** `$ref` is the renamed FASTA created in the previous step.
+> In the script "digest\_emboss.zsh", change the paths to the executables of `restrict`, `bedtools` and `rebase`.
 > 
-> **②** In the script "digest\_emboss.zsh", change the paths to the executables of `restrict`, `bedtools` and `rebase`.
-> 
-> **③** Don’t forget to make sure that the enzyme matches the one used for making your Hi-C libraries. Another common choice is `--enzyme 'DpnII' --sitelen 4`.
+> Don’t forget to make sure that the enzyme matches the one used for making your Hi-C libraries. Another common choice is `--enzyme 'DpnII' --sitelen 4`.
 
 2. Put the gzipped FASTQ files of the Hi-C reads (or symbolic links to them) of the Hi-C reads in the folder "hic".
 3. Now start the Hi-C mapping.
@@ -186,20 +183,18 @@ The project folder should have the following subdirectory structure. At the star
 ```
 cd $projectdir/mapping/
 ref='$projectdir/assembly/project_name/project_name.p_ctg.fa'
-map='$bitbucket/shell/run_hic_mapping.zsh' ①
-bed=${ref:r}_MboI_fragments_30bp.bed ②
+map='$bitbucket/shell/run_hic_mapping.zsh'
+bed=${ref:r}_MboI_fragments_30bp.bed
 cd $projectdir
 
-$map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $TMPDIR hic ③ ④
+$map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $TMPDIR hic
 ```
 
-> **①** You need to specify in the script the paths to the following executables: Cutadapt (`--cutadapt`), bgzip (`--bgzip`), Minimap2 (`--minimap`), Novosort (`--novosort`), SAMtools (`--samtools`), and BEDTools (`--bedtools`).
+> In the script "run\_hic\_mapping.zsh", specify the paths to the following executables: Cutadapt (`--cutadapt`), bgzip (`--bgzip`), Minimap2 (`--minimap`), Novosort (`--novosort`), SAMtools (`--samtools`), and BEDTools (`--bedtools`).
 > 
-> **②** Use the BED file with the in silico digest for the correct restriction enzyme. Using the wrong enzyme will give wrong results.
+> Specify correct linker sequences that is created by ligation of fill-in overhangs during the Hi-C protocol. If HindIII was used, the correct linker is AAGCTAGCTT; if DpnII was used, the linker is GATCGATC.
 > 
-> **③** Specify correct linker sequences that is created by ligation of fill-in overhangs during the Hi-C protocol. If HindIII was used, the correct linker is AAGCTAGCTT; if DpnII was used, the linker is GATCGATC.
-> 
-> **④** The temporary directory needs to be large enough to hold huge BAM files (dozens of GB).
+> The temporary directory $TMPDIR needs to be large enough to hold huge BAM files (dozens of GB).
 
 ## 3. Creating the guide map table
 
@@ -237,8 +232,8 @@ $map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $
 2. In case you want to create a guide map from an available reference genome, first you need to obtain single-copy 100bp regions.
 
 ```
-mask='$bitbucket/miscellaneous/mask_assembly.zsh' ①
-fa='$projectdir/reference_assembly.fasta' ②
+mask='$bitbucket/miscellaneous/mask_assembly.zsh'
+fa='$projectdir/reference_assembly.fasta'  #reference assembly for your studied species
 bed="${fa:t:r}_masked_noGaps.bed"
 out="${fa:t:r}_singlecopy_100bp"
 
@@ -248,9 +243,7 @@ awk '$3 - $2 >= 100' $bed | grep -v chrUn | awk '{print $0"\tseq_"NR}' \
  | tee $out.bed | bedtools getfasta -fi $fa -bed /dev/stdin -name -fo $out.fasta
 ```
 
-> **①** You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`).
-> 
-> **②** Use a reference assembly for the studied species.
+> In script "mask\_assembly.zsh", specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`).
 
 1. Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.
 2. Now it is time to build the pseudo POPSEQ file (the guide map), which is used as input for the TRITEX pipeline.
@@ -325,7 +318,7 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
 
    ```
    # Load the R functions for pseudomolecule construction.
-   source("$bitbucket/R/pseudomolecule_construction.R") ①
+   source("$bitbucket/R/pseudomolecule_construction.R")
 
    # Import the guide map.
    readRDS('$projectdir/project_name_pseudopopseq.Rds') -> popseq
@@ -335,8 +328,8 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    fread(f, head=F, select=1:2, col.names=c("scaffold", "length")) -> fai
 
    # Read guide map alignment.
-   f <- '$projectdir/assembly/project_name/project_name_ctg.paf.gz' ②
-   read_morexaln_minimap(paf=f, popseq=popseq, minqual=30, minlen=500, prefix=F) -> morexaln ③
+   f <- '$projectdir/assembly/project_name/project_name_ctg.paf.gz'  #IDs in this file should be the same as in the guide map
+   read_morexaln_minimap(paf=f, popseq=popseq, minqual=30, minlen=500, prefix=F) -> morexaln  #Change the `minlen` parameter depending on the length of the guide map marker size
 
    # Read Hi-C links
    dir <- '$projectdir/hic'
@@ -344,30 +337,23 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
           header=F, col.names=c("scaffold1", "pos1", "scaffold2", "pos2")) -> fpairs
    ```
 
-> **①** Note that `$bitbucket`, `$projectdir` and `$assembly` will not be evaluated as variables by R here and in all other instances below. Replace them always with a correct path by modifying the command with a text editor before running it.
-> 
-> **②** Note that IDs in this file should be the same as in the guide map. Modify them if needed.
-> 
-> **③** Change the `minlen` parameter depending on the length of the guide map marker size.
+> Note that `$bitbucket`, `$projectdir` and `$assembly` will not be evaluated as variables by R here and in all other instances below. Replace them always with a correct path by modifying the command with a text editor before running it.
+
 
 4. Now initialize and save the assembly.
 
    ```
    # Init and save assembly, replace species with the right one. Here we are going to use "maize".
    init_assembly(fai=fai, cssaln=morexaln, fpairs=fpairs) -> assembly
-   anchor_scaffolds(assembly = assembly, popseq=popseq, species="maize") -> assembly ①
+   anchor_scaffolds(assembly = assembly, popseq=popseq, species="maize") -> assembly
    add_hic_cov(assembly, binsize=1e4, binsize2=1e6,
-   	minNbin=50, innerDist=3e5, cores=40) -> assembly  ② ③
-   saveRDS(assembly, file="assembly.Rds") ④
+   	minNbin=50, innerDist=3e5, cores=40) -> assembly
+   saveRDS(assembly, file="assembly.Rds")
    ```
 
-> **①** Possible values for the species parameter are: 'barley', 'wheat' (works for A genome species, *T. turgidum* and *T. aestivum*), 'maize', 'rye', 'oats\_new' (chromosomes 1 to 7, subgenomes A, B and D), 'avena\_barbata', 'hordeum\_bulbosum', 'faba\_bean', and 'lolium'. More species can be accomodated by re-defining the function `chrNames()`. Type chrNames to see its source code. The only use of species is to map numeric chromosome IDs to proper names, e.g. 1 to 1H in barley (see the note by [Linde-Laursen](https://wheat.pw.usda.gov/ggpages/bgn/26/text261a.html) to see why this makes a difference) or 21 to 7D.
+> Possible values for the species parameter are: 'barley', 'wheat' (works for A genome species, *T. turgidum* and *T. aestivum*), 'maize', 'rye', 'oats\_new' (chromosomes 1 to 7, subgenomes A, B and D), 'avena\_barbata', 'hordeum\_bulbosum', 'faba\_bean', and 'lolium'. More species can be accomodated by re-defining the function `chrNames()`. Type chrNames to see its source code. The only use of species is to map numeric chromosome IDs to proper names, e.g. 1 to 1H in barley (see the note by [Linde-Laursen](https://wheat.pw.usda.gov/ggpages/bgn/26/text261a.html) to see why this makes a difference) or 21 to 7D.
 > 
-> **②** Change number of cores according to match your allocated resources. Don’t forget to change it in the next steps also.
-> 
-> **③** `binsize` is the resolution at which physical coverage is calculated. `binsize2` is the size of batches for parallelization; smaller values decrease memory consumption.
-> 
-> **④** It is recommended to prefix the names of the RDS files created in this and later steps with the current date (e.g. "220801\_assembly.Rds") to distinguish different versions.
+> `binsize` is the resolution at which physical coverage is calculated. `binsize2` is the size of batches for parallelization; smaller values decrease memory consumption.
 
 ### 4.1. Breaking chimeric scaffolds
 
@@ -377,15 +363,13 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    # Create diagnostic plots for contigs longer than 1 Mb.
    assembly$info[length >= 1e6, .(scaffold, length)][order(-length)] -> s
    plot_chimeras(assembly=assembly, scaffolds=s, species="maize",
-   	refname="B73", autobreaks=F, mbscale=1, file="assembly_1Mb.pdf", cores=40) ①
+   	refname="B73", autobreaks=F, mbscale=1, file="assembly_1Mb.pdf", cores=40)  #Don’t forget to change species and reference name
 
    # Diagnostic plots for putative chimeras with strong drops in Hi-C coverage.
    assembly$info[length >= 1e6 & mri <= -3, .(scaffold, length)][order(-length)] -> s
    plot_chimeras(assembly=assembly, scaffolds=s, species="maize",
    	refname="B73", autobreaks=F, mbscale=1, file="assembly_chimeras.pdf", cores=40)
    ```
-
-> **①** Don’t forget to change species and reference name.
 
 2. Check the plots and search for drops in Hi-C coverage, misalignments and chimeras. For each case, assign the PDF page and scaffold position which needs breaking.
 3. For instance, in **example_assembly_1Mb.pdf**, the scaffolds that need to be broken are on pages 3, 6, and 9. We need to change the bin region on the code for each scaffold, like this:
@@ -417,10 +401,8 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
 
    ```
    break_scaffolds(b, assembly, prefix="contig_corrected_v1_", slop=1e4, cores=40, species="maize") -> assembly_v2
-   saveRDS(assembly_v2, file="assembly_v2.Rds") ①
+   saveRDS(assembly_v2, file="assembly_v2.Rds") 
    ```
-
-> **①** This will create a new file for the assembly.
 
 5. Now we make the Hi-C map. Three files will be generated: a PDF with the intrachromosomal plots, a PDF with the interchromosomal plots, and a file to be loaded into R Shiny Map inspector (`*_export.Rds`).
 
@@ -473,8 +455,8 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    	file="assembly_v2_chimeras_final.pdf", cores=40)
 
    break_scaffolds(b, assembly_v2, prefix="contig_corrected_v2_", slop=1e4,
-   	cores=40, species="maize") -> assembly_v3 ①
-   saveRDS(assembly_v3, file="assembly_v3.Rds") ①
+   	cores=40, species="maize") -> assembly_v3 
+   saveRDS(assembly_v3, file="assembly_v3.Rds")  #Don’t forget to update assembly and Hi-C map versions
 
    fbed <- '$projectdir/assembly/project_name/project_name.p_ctg_MboI_fragments_30bp.bed'
    read_fragdata(info=assembly_v3$info, file=fbed) -> frag_data
@@ -492,8 +474,6 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    	cores=40, species="maize", nuc=snuc) -> hic_map_v2 ①
    ```
 
-> **①** Don’t forget to update assembly and Hi-C map versions.
-
 7. If another round of breaking scaffolds is needed, you can just run the previous block again. Don’t forget to change the output files and object names (assembly\_vX, hic\_map\_vX).
 8. If no more chimeras are found, proceed to decreasing the size to 500 kb.
 
@@ -502,20 +482,18 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
 
    hic_map(info=hic_info, assembly=assembly_v3, frags=frag_data$bed, species="maize",
    	ncores=40, min_nfrag_scaffold=30, max_cM_dist = 1000, binsize=2e5,
-   	min_nfrag_bin=10, gap_size=100) -> hic_map_v3 ①
+   	min_nfrag_bin=10, gap_size=100) -> hic_map_v3  #Don’t forget to put the correct object name here
 
-   saveRDS(hic_map_v3, file="hic_map_v3.Rds") ①
+   saveRDS(hic_map_v3, file="hic_map_v3.Rds") #Don’t forget to put the correct object name here
 
    snuc <- '$projectdir/assembly/project_name.p_ctg_MboI_fragments_30bp_split.nuc.txt'
    hic_plots("hic_map_v2.Rds", assembly=assembly_v3, cores=40,
-   	species="maize", nuc=snuc) -> hic_map_v3 ①
+   	species="maize", nuc=snuc) -> hic_map_v3 #Don’t forget to put the correct object name here
 
 
    # Exporting to Excel the table that will be used for manual curation.
    write_hic_map(rds="hic_map_v3.Rds", file="hic_map_v3.xlsx", species="maize")
    ```
-
-> **①** Don’t forget to put the correct object name here.
 
 ## 5. Manual curation of scaffolds
 
@@ -542,12 +520,10 @@ Now that we have the scaffolded assembly, we are going to check if there are any
      x[i, plot(pch=".", main=i, agp_pos/1e6, guide_pos/1e6, xlab="Hi-C AGP (Mb)", ylab="guide (Mb)", las=1, bty='l'), on="agp_chr"]
 
      # Draw contig boundaries, use correct hic_map version here
-     hic_map_v3$agp[agp_chr == i & gap == T][, abline(v=agp_start/1e6, col="gray")] ①
+     hic_map_v3$agp[agp_chr == i & gap == T][, abline(v=agp_start/1e6, col="gray")]  #Don’t forget to change objects' names
    })
    dev.off()
    ```
-
-> **①** Don’t forget to change objects' names.
 
 ### 5.2. Checking Hi-C maps
 
@@ -608,12 +584,10 @@ Figure 2. Manual curation in the TRITEX’s correct-map-inspect cycle. (A) The H
 
 ```
 fasta <- '$projectdir/assembly/project_name/project_name.p_ctg.fa'
-sink("pseudomolecules_v1.log") ①
+sink("pseudomolecules_v1.log")
 compile_psmol(fasta=fasta, output="pseudomolecules_v1",
 	hic_map=hic_map_v4, assembly=assembly_v3, cores=30)
-sink() ①
+sink()
 ```
-
-> **①** That opens and closes a log file.
 
 Last updated 2022-12-15 15:16:29 +0100
