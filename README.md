@@ -3,7 +3,6 @@
 Table of Contents
 
 * Introduction
-  + Short-read TRITEX
   + Installing the required tools
   + Setting up the folder structure
 * 1. Obtaining the input contig assembly
