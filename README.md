@@ -388,7 +388,7 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
 > **①** Don’t forget to change species and reference name.
 
 2. Check the plots and search for drops in Hi-C coverage, misalignments and chimeras. For each case, assign the PDF page and scaffold position which needs breaking.
-3. For instance, in [this example](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/example_assembly_1Mb.pdf), the scaffolds that need to be broken are on pages 3, 6, and 9. We need to change the bin region on the code for each scaffold, like this:
+3. For instance, in **example_assembly_1Mb.pdf**, the scaffolds that need to be broken are on pages 3, 6, and 9. We need to change the bin region on the code for each scaffold, like this:
 
    ```
    assembly$info[length >= 1e6, .(scaffold, length)][order(-length)] -> ss
