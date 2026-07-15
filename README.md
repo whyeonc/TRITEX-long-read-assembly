@@ -2,21 +2,21 @@
 
 **Contents**
 
-* Introduction
-  + Installing the required tools
-  + Setting up the folder structure
-* 1. Obtaining the input contig assembly
-* 2. Mapping Hi-C data
-* 3. Creating the guide map table
-  + 3.1. If you already have a guide map
-  + 3.2. If you are using a reference genome to create the guide map
-  + 3.3. Mapping the guide map sequences to the genome
-* 4. Creating the assembly object
-  + 4.1. Breaking chimeric scaffolds
-* 5. Manual curation of scaffolds
-  + 5.1. Collinearity plots
-  + 5.2. Checking Hi-C maps
-* 6. Compiling pseudomolecules
+- [Introduction](#introduction)
+  - [Installing the required tools](#installing-the-required-tools)
+  - [Setting up the folder structure](#setting-up-the-folder-structure)
+- [1. Obtaining the input contig assembly](#1-obtaining-the-input-contig-assembly)
+- [2. Mapping Hi-C data](#2-mapping-hi-c-data)
+- [3. Creating the guide map table](#3-creating-the-guide-map-table)
+  - [3.1. If you already have a guide map](#31-if-you-already-have-a-guide-map)
+  - [3.2. If you are using a reference genome to create the guide map](#32-if-you-are-using-a-reference-genome-to-create-the-guide-map)
+  - [3.3. Mapping the guide map sequences to the genome](#33-mapping-the-guide-map-sequences-to-the-genome)
+- [4. Creating the assembly object](#4-creating-the-assembly-object)
+  - [4.1. Breaking chimeric scaffolds](#41-breaking-chimeric-scaffolds)
+- [5. Manual curation of scaffolds](#5-manual-curation-of-scaffolds)
+  - [5.1. Collinearity plots](#51-collinearity-plots)
+  - [5.2. Checking Hi-C maps](#52-checking-hi-c-maps)
+- [6. Compiling pseudomolecules](#6-compiling-pseudomolecules)
 
 This is the documentation of TRITEX, a computational pipeline for chromosome-scale assembly of plant genomes. It was developed in the research group Domestication Genomics at the Leibniz Institute of Plant Genetics and Crop Research (IPK) Gatersleben.
 
