@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.12">
+<title>TRITEX long-read assembly pipeline</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment @import statement to use as custom stylesheet */
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
+article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+abbr[title]{border-bottom:1px dotted}
+b,strong{font-weight:bold}
+dfn{font-style:italic}
+hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,*::before,*::after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{font-family:inherit;font-weight:400;font-size:1em;line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0;font-size:1em}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
+abbr{text-transform:none}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
+blockquote cite::before{content:"\2014 \0020"}
+blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede;word-wrap:normal}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre).nobreak{word-wrap:normal}
+:not(pre).nowrap{white-space:nowrap}
+:not(pre).pre-wrap{white-space:pre-wrap}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre>code{display:block}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:none;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:rgba(255,255,255,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details>summary:first-of-type{cursor:pointer;display:list-item;outline:none;margin-bottom:.75em}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:inherit}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
+.exampleblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child{margin-bottom:0}
+.sidebarblock{border-style:solid;border-width:1px;border-color:#dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;-webkit-border-radius:4px;border-radius:4px}
+.sidebarblock>:first-child{margin-top:0}
+.sidebarblock>:last-child{margin-bottom:0}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos{border-right:1px solid currentColor;opacity:.35;padding-right:.5em}
+pre.pygments .lineno{border-right:1px solid currentColor;opacity:.35;display:inline-block;margin-right:.75em}
+pre.pygments .lineno::before{content:"";margin-right:-.125em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content{margin-bottom:1.25em;word-wrap:anywhere}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>*>tr>*{border-width:1px}
+table.grid-cols>*>tr>*{border-width:0 1px}
+table.grid-rows>*>tr>*{border-width:1px 0}
+table.frame-all{border-width:1px}
+table.frame-ends{border-width:1px 0}
+table.frame-sides{border-width:0 1px}
+table.frame-none>colgroup+*>:first-child>*,table.frame-sides>colgroup+*>:first-child>*{border-top-width:0}
+table.frame-none>:last-child>:last-child>*,table.frame-sides>:last-child>:last-child>*{border-bottom-width:0}
+table.frame-none>*>tr>:first-child,table.frame-ends>*>tr>:first-child{border-left-width:0}
+table.frame-none>*>tr>:last-child,table.frame-ends>*>tr>:last-child{border-right-width:0}
+table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+ul.checklist{margin-left:.625em}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
+ul.inline{display:-ms-flexbox;display:-webkit-box;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+td.hdlist2{word-wrap:anywhere}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:solid 4px #fff;-webkit-box-shadow:0 0 0 1px #ddd;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
+.gist .file-data>table td.line-data{width:99%}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:50%;border-radius:50%;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#header,#content,#footnotes,#footer{max-width:none}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media print,amzn-kf8{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge .cm {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cp {
+  color: #999999;
+  font-weight: bold;
+}
+pre.rouge .c1 {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cs {
+  color: #999999;
+  font-weight: bold;
+  font-style: italic;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cpf {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+pre.rouge .gd {
+  color: #000000;
+  background-color: #ffdddd;
+}
+pre.rouge .ge {
+  color: #000000;
+  font-style: italic;
+}
+pre.rouge .gr {
+  color: #aa0000;
+}
+pre.rouge .gh {
+  color: #999999;
+}
+pre.rouge .gi {
+  color: #000000;
+  background-color: #ddffdd;
+}
+pre.rouge .go {
+  color: #888888;
+}
+pre.rouge .gp {
+  color: #555555;
+}
+pre.rouge .gs {
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #aaaaaa;
+}
+pre.rouge .gt {
+  color: #aa0000;
+}
+pre.rouge .kc {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kd {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kn {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kp {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kr {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kt {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .k, pre.rouge .kv {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .mf {
+  color: #009999;
+}
+pre.rouge .mh {
+  color: #009999;
+}
+pre.rouge .il {
+  color: #009999;
+}
+pre.rouge .mi {
+  color: #009999;
+}
+pre.rouge .mo {
+  color: #009999;
+}
+pre.rouge .m, pre.rouge .mb, pre.rouge .mx {
+  color: #009999;
+}
+pre.rouge .sa {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .sb {
+  color: #d14;
+}
+pre.rouge .sc {
+  color: #d14;
+}
+pre.rouge .sd {
+  color: #d14;
+}
+pre.rouge .s2 {
+  color: #d14;
+}
+pre.rouge .se {
+  color: #d14;
+}
+pre.rouge .sh {
+  color: #d14;
+}
+pre.rouge .si {
+  color: #d14;
+}
+pre.rouge .sx {
+  color: #d14;
+}
+pre.rouge .sr {
+  color: #009926;
+}
+pre.rouge .s1 {
+  color: #d14;
+}
+pre.rouge .ss {
+  color: #990073;
+}
+pre.rouge .s, pre.rouge .dl {
+  color: #d14;
+}
+pre.rouge .na {
+  color: #008080;
+}
+pre.rouge .bp {
+  color: #999999;
+}
+pre.rouge .nb {
+  color: #0086B3;
+}
+pre.rouge .nc {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .no {
+  color: #008080;
+}
+pre.rouge .nd {
+  color: #3c5d5d;
+  font-weight: bold;
+}
+pre.rouge .ni {
+  color: #800080;
+}
+pre.rouge .ne {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nl {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nn {
+  color: #555555;
+}
+pre.rouge .nt {
+  color: #000080;
+}
+pre.rouge .vc {
+  color: #008080;
+}
+pre.rouge .vg {
+  color: #008080;
+}
+pre.rouge .vi {
+  color: #008080;
+}
+pre.rouge .nv, pre.rouge .vm {
+  color: #008080;
+}
+pre.rouge .ow {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .o {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .w {
+  color: #bbbbbb;
+}
+pre.rouge {
+  background-color: #f8f8f8;
+}
+</style>
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>TRITEX long-read assembly pipeline</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#_short_read_tritex">Short-read TRITEX</a></li>
+<li><a href="#_installing_the_required_tools">Installing the required tools</a></li>
+<li><a href="#_setting_up_the_folder_structure">Setting up the folder structure</a></li>
+</ul>
+</li>
+<li><a href="#_obtaining_the_input_contig_assembly">1. Obtaining the input contig assembly</a></li>
+<li><a href="#_mapping_hi_c_data">2. Mapping Hi-C data</a></li>
+<li><a href="#_creating_the_guide_map_table">3. Creating the guide map table</a>
+<ul class="sectlevel2">
+<li><a href="#_if_you_already_have_a_guide_map">3.1. If you already have a guide map</a></li>
+<li><a href="#_if_you_are_using_a_reference_genome_to_create_the_guide_map">3.2. If you are using a reference genome to create the guide map</a></li>
+<li><a href="#_mapping_the_guide_map_sequences_to_the_genome">3.3. Mapping the guide map sequences to the genome</a></li>
+</ul>
+</li>
+<li><a href="#_creating_the_assembly_object">4. Creating the assembly object</a>
+<ul class="sectlevel2">
+<li><a href="#_breaking_chimeric_scaffolds">4.1. Breaking chimeric scaffolds</a></li>
+</ul>
+</li>
+<li><a href="#_manual_curation_of_scaffolds">5. Manual curation of scaffolds</a>
+<ul class="sectlevel2">
+<li><a href="#_collinearity_plots">5.1. Collinearity plots</a></li>
+<li><a href="#_checking_hi_c_maps">5.2. Checking Hi-C maps</a></li>
+</ul>
+</li>
+<li><a href="#_compiling_pseudomolecules">6. Compiling pseudomolecules</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is the documentation of TRITEX, a computational pipeline for chromosome-scale assembly of plant genomes. It was developed in the research group Domestication Genomics at the Leibniz Institute of Plant Genetics and Crop Research (IPK) Gatersleben.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/2787b4093a3bd79bf1170a7fbd312bb667ac8af9/logo.png" alt="logo" width="400">
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://www.ipk-gatersleben.de/en/imprint">Legal notice</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The purpose of the TRITEX long-read assembly pipeline is to build chromosome-scale sequence assemblies for inbred plant genomes. As such, it also applicable in pan-genome projects.</p>
+</div>
+<div class="paragraph">
+<p>TRITEX uses an input contig assembly (using <a href="https://www.nature.com/articles/s41587-019-0217-9">HiFi long-reads</a>, for example), Hi-C reads and a guide map to assemble the genomes within a short time frame. Manual curation of contig placements is done intuitively with user-editable tables and plots.</p>
+</div>
+<div class="paragraph">
+<p>The source code of the pipeline is open and hosted in a public Bitbucket <a href="https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/src/master/">repository</a>.</p>
+</div>
+<div class="paragraph">
+<p>The TRITEX workflow can be broadly divided into two stages:</p>
+</div>
+<div class="olist numbers">
+<ol class="numbers">
+<li>
+<p><span class="red"><em>Steps 1-3 of this tutorial.</em> You will run shell scripts combining standard bioinformatics tools into pipelines for processing Hi-C reads and aligning guide map markers.</span></p>
+</li>
+<li>
+<p><span class="blue"><em>Steps 4-6 of this tutorial.</em> Outputs of phase 1 are loaded into R to interactively create a TRITEX assembly object with tables listing Hi-C links and guide map alignment records.</span></p>
+</li>
+</ol>
+</div>
+<div id="img-overview" class="imageblock">
+<div class="content">
+<img src="https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/tritex_overview.jpg" alt="tritex overview">
+</div>
+<div class="title">Figure 1. Graphical overview of the TRITEX pipeline.</div>
+</div>
+<div class="paragraph">
+<p>The core algorithm for Hi-C map construction searches for a minimum spanning tree in the graph induced by Hi-C contact matrix and further refines it to include as many scaffolds as possible and to orient them relative to the chromosomal orientation of the guide map. The algorithm has been described in detail by <a href="https://doi.org/10.1038/sdata.2017.44:">Beier <em>et al.</em> (2017)</a>.</p>
+</div>
+<div class="paragraph">
+<p>In case of questions on the pipeline, contact <a href="mailto:mascher@ipk-gatersleben.de">Martin Mascher</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_short_read_tritex">Short-read TRITEX</h3>
+<div class="paragraph">
+<p>The previous version of TRITEX used short-read data.</p>
+</div>
+<div class="paragraph">
+<p>The old version of this tutorial is available <a href="https://tritexassembly.bitbucket.io/deprecated_files">here</a>.</p>
+</div>
+<div class="paragraph">
+<p>See also the first TRITEX <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1899-5">paper</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_installing_the_required_tools">Installing the required tools</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The TRITEX pipeline needs to be run on rather powerful Unix servers. It has been tested on servers running recent CentOS Linux version controlled by the SLURM resource scheduler. Some commands like Hi-C read mapping can be submmitted as batch job. Pseudomolecule construction in R requires interactive sessions, either by direct SSH access or use of interactives SLURM sessions. In any case, the use of a terminal multiplexer such as <a href="https://github.com/tmux/tmux/wiki">tmux</a> is recommended.
+Some jobs may run for several days. If <a href="https://web.mit.edu/kerberos/">Kerberos</a> authentification is used, make sure that tickets are renewed.</p>
+</li>
+<li>
+<p>Install the following software. The pipeline has been run successfully with the versions indicated below. Using the most recent versions should be fine as well.</p>
+<div class="exampleblock">
+<div class="content">
+<div class="olist number">
+<ol class="number">
+<li>
+<p><a href="http://zsh.sourceforge.net/">Z shell</a>, 5.0.2</p>
+</li>
+<li>
+<p><a href="https://www.gnu.org/software/parallel/">GNU Parallel</a>, 20150222, <a href="https://www.usenix.org/publications/login/february-2011-volume-36-number-1/gnu-parallel-command-line-power-tool">paper</a></p>
+</li>
+<li>
+<p><a href="https://hifiasm.readthedocs.io">Hifiasm</a>, 0.15.1-r334, <a href="https://www.nature.com/articles/s41592-020-01056-5">paper</a></p>
+</li>
+<li>
+<p><a href="https://https://github.com/lh3/gfatools">gfatools</a>, 0.5</p>
+</li>
+<li>
+<p><a href="https://github.com/samtools/samtools">SAMtools</a>, 1.9, <a href="https://academic.oup.com/bioinformatics/article/25/16/2078/204688">paper</a></p>
+</li>
+<li>
+<p>bgzip and tabix, part of <a href="https://github.com/samtools/bcftools">BCFtools</a>, 1.9, <a href="https://academic.oup.com/bioinformatics/article/27/5/718/262743">paper</a></p>
+</li>
+<li>
+<p><a href="https://github.com/lh3/seqtk">Seqtk</a>, 1.0-r76</p>
+</li>
+<li>
+<p><a href="https://github.com/arq5x/bedtools2">bedtools</a>, 2.26.0, <a href="https://academic.oup.com/bioinformatics/article/26/6/841/244688">paper</a></p>
+</li>
+<li>
+<p><a href="https://www.r-project.org/">R</a>, 3.5.1, <a href="https://amstat.tandfonline.com/doi/abs/10.1080/10618600.1996.10474713#.XDDdTy2ZP1I">paper</a></p>
+</li>
+<li>
+<p><a href="https://zlib.net/pigz/">pigz</a>, 2.3.4, parallel gzip</p>
+</li>
+<li>
+<p><a href="https://github.com/lh3/minimap2">minimap2</a>, 2.14, <a href="https://academic.oup.com/bioinformatics/article-abstract/34/18/3094/4994778?redirectedFrom=PDF">paper</a></p>
+</li>
+<li>
+<p><a href="https://cutadapt.readthedocs.io/en/stable/guide.html">Cutadapt</a>, 1.15, <a href="http://journal.embnet.org/index.php/embnetjournal/article/view/200">paper</a></p>
+</li>
+<li>
+<p><a href="http://emboss.sourceforge.net/">EMBOSS</a>, 6.6.0, <a href="https://doi.org/10.1016/S0168-9525(00)02024-2">paper</a></p>
+</li>
+<li>
+<p><a href="https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbmap-guide/">BBMap</a>, 37.93</p>
+</li>
+<li>
+<p>faToTwoBit and twoBitInfo, from the <a href="http://hgdownload.cse.ucsc.edu/admin/exe/">UCSC Genome Browser</a>,  v.3.69</p>
+</li>
+<li>
+<p><a href="http://www.novocraft.com/products/novosort/">Novosort</a>, 3.06.05. This is commercial software. A single-threaded version is available for free. Novosort is used only in Hi-C read mapping scripts. An alternative using SAMtools instead is available <a href="https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/src/master/shell/">here</a>.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The pipeline assumes that the GNU (as opposed to BSD) versions of common UNIX tools (<code>coreutils</code>, <code>sed</code>, <code>awk</code>) are used.</p>
+</div>
+</li>
+<li>
+<p>The following R packages should be installed and accessible in <code>.libPaths()</code>. The versions specified are known to work with TRITEX. Newer versions will likely work as well.</p>
+<div class="exampleblock">
+<div class="content">
+<div class="olist number">
+<ol class="number">
+<li>
+<p><a href="https://cran.r-project.org/web/packages/data.table/index.html">data.table</a>, 1.11.8</p>
+</li>
+<li>
+<p><a href="https://cran.r-project.org/web/packages/stringi/index.html">stringi</a>, 1.2.4</p>
+</li>
+<li>
+<p><a href="https://cran.r-project.org/web/packages/igraph/index.html">igraph</a>, 1.2.2, <a href="https://static1.squarespace.com/static/5b68a4e4a2772c2a206180a1/t/5cd1e3cbb208fc26c99de080/1557259212150/c1602a3c126ba822d0bc4293371c.pdf">paper</a></p>
+</li>
+<li>
+<p><a href="https://cran.r-project.org/web/packages/zoo/index.html">zoo</a>, 1.8-3, <a href="https://arxiv.org/abs/math/0505527">paper</a></p>
+</li>
+<li>
+<p><a href="https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf">parallel</a>, included in R-core in R versions &gt; 2.14</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</li>
+<li>
+<p>If you want to use the <a href="https://shiny.rstudio.com/">R Shiny</a> app Hi-C map inspector, you need to set up a web server running R Shiny. Refer to the R Shiny <a href="https://www.linode.com/docs/guides/how-to-deploy-rshiny-server-on-ubuntu-and-debian/">manual</a>. Note that setting up a Shiny server is a non-trivial task of Unix systems administration and requires super-user rights.</p>
+</li>
+<li>
+<p>Here are some thoughts on hardware requirements and how to allocate resource on institutional resource scheduling systems:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>For the hardware requirements of primary contig assembly, we refer to the documentation of hifiasm[<a href="https://github.com/chhylp123/hifiasm#results" class="bare">https://github.com/chhylp123/hifiasm#results</a>], a tool commonly used for that purpose. Thirty 30 and 1 TB RAM will suffice to assemble genomes sequences of 15 GB size within a few days.</p>
+</li>
+<li>
+<p>The Hi-C read mapping script uses <code>minimap2</code>, which is multi-threaded.
+More cores translate into shorter run times approximately linearly.
+Sorting of alignment records <code>Novosort</code> (and <code>samtools</code>) can be speeded up by allocating more RAM for in-memory sorting. Otherwise, temporary disk space is used (which incurs longer run-time because of disk I/O).</p>
+</li>
+<li>
+<p>The interactive R sessions for pseudomolecule construction hold large tables of Hi-C links in main memory. For a genome in size range of 5-15 Gb, 500 GB - 1 TB of main memory may be required.
+Some parts of the pseudomolecule construction are multithreaded (e.g. the <code>hic_map()</code> function),
+but savings in run time are negligeable, so running R on an allocation of 1 core will be just fine.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Clone the Bitbucket <a href="https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/src/master/">repository</a> of the TRITEX assembly pipeline.  The path to the local copy of the repository will be referenced by <code>$bitbucket</code> in the code listings.</p>
+</li>
+<li>
+<p>The scripts used below have parameters such as <code>--bedtools</code> or <code>--samtools</code> (indicated in the code listings) to specify the absolute paths to the required executables. For better readability, they are omitted from the commands.</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Instead of specifying the paths each time you call the scripts, you may also edit the scripts and modify the default paths. We chose not to use executables in <code>$PATH</code> to enforce proper documentation of software versions.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setting_up_the_folder_structure">Setting up the folder structure</h3>
+<div class="paragraph">
+<p>A folder for each assembly project should be created. We refer to this directory as <code>$projectdir</code> in the code listings below.</p>
+</div>
+<div class="paragraph">
+<p>The project folder should have the following subdirectory structure. At the start of the pipeline, all folders except "raw_reads" should be empty.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p><strong>raw_reads</strong></p>
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p><strong>hifi_reads</strong></p>
+</li>
+<li>
+<p><strong>hic_reads</strong></p>
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p>These folders contain the raw reads (or symbolic links to them).</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>assembly</strong></p>
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p>This folder will contain the CCS assembly.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>mapping</strong></p>
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p>This folder will contain the results of mapping of Hi-C reads to the HiFi assembly.</p>
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p><strong>hic</strong></p>
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p>In this folder you should create symbolic links to the Hi-C reads.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>pseudomolecules</strong></p>
+<div class="ulist no-bullet">
+<ul class="no-bullet">
+<li>
+<p>This folder will be used to run the Pseudomolecule construction section of this tutorial. It will contain the R objects of the assemblies, plots for quality assessment and final pseudomolecule FASTA files.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_obtaining_the_input_contig_assembly">1. Obtaining the input contig assembly</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Any long-read input assembly will work, but in this tutorial we are going to use HiFi reads with hifiasm.</p>
+</li>
+<li>
+<p>Let&#8217;s assemble the HiFi reads with hifiasm. Set up a list of all FASTQ files and run hifiasm. Results will be inside the <code>$projectdir/assembly/project_name/</code> directory.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nb">cd</span> <span class="nv">$projectdir</span>/assembly
+<span class="nv">d</span><span class="o">=</span><span class="s1">'$projectdir/raw_reads/hifi_reads'</span>
+find <span class="nv">$d</span> | <span class="nb">grep</span> <span class="s1">'fastq.gz$'</span> <span class="o">&gt;</span> hifi_reads.txt
+
+<span class="nv">reads</span><span class="o">=</span><span class="s1">'hifi_reads.txt'</span>
+<span class="nv">prefix</span><span class="o">=</span><span class="s1">'project_name'</span>
+<span class="nv">threads</span><span class="o">=</span>30 <i class="conum" data-value="1"></i><b>(1)</b>
+
+<span class="nb">mkdir</span> <span class="nv">$prefix</span>
+<span class="nv">out</span><span class="o">=</span><span class="nv">$prefix</span>/<span class="nv">$prefix</span>
+
+xargs <span class="nt">-a</span> <span class="nv">$reads</span> hifiasm <span class="nt">-t</span> <span class="nv">$threads</span> <span class="nt">-o</span> <span class="nv">$out</span> <span class="o">&gt;</span> <span class="nv">$out</span>.out 2&gt; <span class="nv">$out</span>.err</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the number of threads you would like to use.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Check the stats of contigs and unitigs.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nb">cd</span> <span class="nv">$projectdir</span>/assembly/project_name/
+
+<span class="nb">grep</span> <span class="s1">'^S'</span> project_name.p_ctg.noseq.gfa | <span class="nb">cut</span> <span class="nt">-f</span> 4 | <span class="nb">cut</span> <span class="nt">-d</span> : <span class="nt">-f</span> 1,3 <span class="se">\</span>
+ | <span class="nb">tr</span> : <span class="s1">'\t'</span> | <span class="nv">$bitbucket</span>/shell/n50 <span class="o">&gt;</span> project_name.p_ctg.noseq.gfa.n50 <i class="conum" data-value="1"></i><b>(1)</b>
+
+<span class="nb">grep</span> <span class="s1">'^S'</span> project_name.p_utg.noseq.gfa | <span class="nb">cut</span> <span class="nt">-f</span> 4 | <span class="nb">cut</span> <span class="nt">-d</span> : <span class="nt">-f</span> 1,3 <span class="se">\</span>
+| <span class="nb">tr</span> : <span class="s1">'\t'</span> | <span class="nv">$bitbucket</span>/shell/n50 <span class="o">&gt;</span> project_name.p_utg.noseq.n50</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The backslash \ will be used throughout the tutorial to break long shell commands into several lines. When pasting the commands or editing them, make sure that no white space follows the backslash. Otherwise, the shell will interpret the lines as belonging to different commands. Also multi-line commands do not tolerate intervening command line (starting with the hash sign #).</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Convert contig GFA to FASTA and change contig names.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nv">gfa</span><span class="o">=</span><span class="s1">'project_name.p_ctg.gfa'</span>
+gfatools gfa2fa <span class="nv">$gfa</span> | seqtk rename - contig_ <span class="o">&gt;</span> <span class="k">${</span><span class="nv">gfa</span>:r<span class="k">}</span>.fa <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The syntax <code>${gfa:r}</code> is specific to the Z shell, see the section of the shell manual on <a href="https://linux.die.net/man/1/zshexpn">expansion and substitution</a>.
+Very usefyl are <code>:r</code> and <code>:t</code> modifiers to remove filename extensions and leading pathname components, respectively. The latter works like the UNIX command <code>basename</code>.</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mapping_hi_c_data">2. Mapping Hi-C data</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>THe first step is to digest <em>in silico</em> the hifiasm assembly with the restriction enzyme used for the preparation of the Hi-C libraries.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nb">cd</span> <span class="nv">$projectdir</span>/assembly/project_name/
+<span class="nv">ref</span><span class="o">=</span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg.fa'</span> <i class="conum" data-value="1"></i><b>(1)</b>
+
+<span class="nv">$bitbucket</span>/shell/digest_emboss.zsh <span class="nt">--ref</span> <span class="nv">$ref</span> <span class="nt">--enzyme</span> <span class="s1">'MboI'</span> <span class="nt">--sitelen</span> 4 <span class="nt">--minlen</span> 30  <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>$ref</code> is the renamed FASTA created in the previous step.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>In the script "digest_emboss.zsh", change the paths to the executables of <code>restrict</code>, <code>bedtools</code> and <code>rebase</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Don&#8217;t forget to make sure that the enzyme matches the one used for making your Hi-C libraries. Another common choice is <code>--enzyme 'DpnII' --sitelen 4</code>.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Put the gzipped FASTQ files of the Hi-C reads (or symbolic links to them) of the Hi-C reads in the folder "hic".</p>
+</li>
+<li>
+<p>Now start the Hi-C mapping.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nb">cd</span> <span class="nv">$projectdir</span>/mapping/
+<span class="nv">ref</span><span class="o">=</span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg.fa'</span>
+<span class="nv">map</span><span class="o">=</span><span class="s1">'$bitbucket/shell/run_hic_mapping.zsh'</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nv">bed</span><span class="o">=</span><span class="k">${</span><span class="nv">ref</span>:r<span class="k">}</span>_MboI_fragments_30bp.bed <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nb">cd</span> <span class="nv">$projectdir</span>
+
+<span class="nv">$map</span> <span class="nt">--threads</span> 64 <span class="nt">--mem</span> <span class="s1">'200G'</span> <span class="nt">--linker</span> <span class="s2">"GATCGATC"</span> <span class="nt">--ref</span> <span class="nv">$ref</span> <span class="nt">--bed</span> <span class="nv">$bed</span> <span class="nt">--tmp</span> <span class="nv">$TMPDIR</span> hic  <i class="conum" data-value="3"></i><b>(3)</b> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>You need to specify in the script the paths to the following executables: Cutadapt (<code>--cutadapt</code>), bgzip (<code>--bgzip</code>), Minimap2 (<code>--minimap</code>), Novosort (<code>--novosort</code>), SAMtools (<code>--samtools</code>), and BEDTools (<code>--bedtools</code>).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the BED file with the in silico digest for the correct restriction enzyme. Using the wrong enzyme will give wrong results.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specify correct linker sequences that is created by ligation of fill-in overhangs during the Hi-C protocol. If HindIII was used, the correct linker is AAGCTAGCTT; if DpnII was used, the linker is GATCGATC.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The temporary directory needs to be large enough to hold huge BAM files (dozens of GB).</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creating_the_guide_map_table">3. Creating the guide map table</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_if_you_already_have_a_guide_map">3.1. If you already have a guide map</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Follow these steps if you already have a guide map. We are going to adjust it to the right format to be used in TRITEX.</p>
+</li>
+<li>
+<p>If you plan on using a reference genome to build a guide map, go to the <a href="#_if_you_are_using_a_reference_genome_to_create_the_guide_map">next section</a>.</p>
+</li>
+<li>
+<p>An example file is available <a href="https://doi.org/10.5447/ipk/2022/20">here</a> (MaizeB73_guidemap_marker_IBM.Rds).</p>
+</li>
+<li>
+<p>You will need a BED file with the genomic positions of your markers. The fourth column should contain IDs like "seq_N", where N goes from 1 to the number of markers.</p>
+</li>
+<li>
+<p>Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="c1"># read the BED file containing the marker regions</span><span class="w">
+</span><span class="n">fread</span><span class="p">(</span><span class="s1">'pseudomolecules_singlecopy_100bp.bed'</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">p</span><span class="w">
+
+</span><span class="n">setnames</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"agp_chr"</span><span class="p">,</span><span class="w"> </span><span class="s2">"agp_start"</span><span class="p">,</span><span class="w"> </span><span class="s2">"agp_end"</span><span class="p">,</span><span class="w"> </span><span class="s2">"seq"</span><span class="p">))</span><span class="w">
+</span><span class="n">p</span><span class="p">[,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">css_contig</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span><span class="w"> </span><span class="n">popseq_cM</span><span class="o">=</span><span class="p">(</span><span class="n">agp_start</span><span class="o">+</span><span class="n">agp_end</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="o">/</span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="c1">#set pseudo-cM as Mb position</span><span class="w">
+    </span><span class="n">sorted_genome</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.character</span><span class="p">(</span><span class="kc">NA</span><span class="p">),</span><span class="w">
+    </span><span class="n">css_contig_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">agp_end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">agp_start</span><span class="p">,</span><span class="w">
+    </span><span class="n">popseq_alphachr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.character</span><span class="p">(</span><span class="n">agp_chr</span><span class="p">),</span><span class="w"> </span><span class="c1"># it needs to be character column</span><span class="w">
+    </span><span class="n">sorted_arm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NA</span><span class="p">)</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">pp</span><span class="w">
+
+</span><span class="n">pp</span><span class="p">[,</span><span class="n">popseq_chr</span><span class="o">:=</span><span class="nf">as.integer</span><span class="p">(</span><span class="n">popseq_alphachr</span><span class="p">)]</span><span class="w">
+</span><span class="n">pp</span><span class="p">[,</span><span class="w"> </span><span class="n">sorted_alphachr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">popseq_alphachr</span><span class="p">]</span><span class="w">
+</span><span class="n">pp</span><span class="p">[,</span><span class="w"> </span><span class="n">sorted_chr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">popseq_chr</span><span class="p">]</span><span class="w">
+</span><span class="n">pp</span><span class="p">[,</span><span class="w"> </span><span class="n">sorted_lib</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">popseq_alphachr</span><span class="p">]</span><span class="w">
+
+</span><span class="c1"># Save as RDS file for use in TRITEX pipeline</span><span class="w">
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span><span class="w"> </span><span class="s2">"project_name_pseudopopseq.Rds"</span><span class="p">)</span></code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_if_you_are_using_a_reference_genome_to_create_the_guide_map">3.2. If you are using a reference genome to create the guide map</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If you have a guide map available, you can skip this step and go to the <a href="#Pseudomolecule construction">next section</a>.</p>
+</li>
+<li>
+<p>In case you want to create a guide map from an available reference genome, first you need to obtain single-copy 100bp regions.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nv">mask</span><span class="o">=</span><span class="s1">'$bitbucket/miscellaneous/mask_assembly.zsh'</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nv">fa</span><span class="o">=</span><span class="s1">'$projectdir/reference_assembly.fasta'</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nv">bed</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">fa</span>:t:r<span class="k">}</span><span class="s2">_masked_noGaps.bed"</span>
+<span class="nv">out</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">fa</span>:t:r<span class="k">}</span><span class="s2">_singlecopy_100bp"</span>
+
+<span class="nv">$mask</span> <span class="nt">--mem</span> 300G <span class="nt">--fasta</span> <span class="nv">$fa</span> <span class="nt">--mincount</span> 2 <span class="nt">--out</span> <span class="s2">"."</span>
+
+<span class="nb">awk</span> <span class="s1">'$3 - $2 &gt;= 100'</span> <span class="nv">$bed</span> | <span class="nb">grep</span> <span class="nt">-v</span> chrUn | <span class="nb">awk</span> <span class="s1">'{print $0"\tseq_"NR}'</span> <span class="se">\</span>
+ | <span class="nb">tee</span> <span class="nv">$out</span>.bed | bedtools getfasta <span class="nt">-fi</span> <span class="nv">$fa</span> <span class="nt">-bed</span> /dev/stdin <span class="nt">-name</span> <span class="nt">-fo</span> <span class="nv">$out</span>.fasta</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>You need to specify the paths to the following executables: BBDuk (<code>bbduk</code>), fatotwobit (<code>bit</code>), twobitinfo (<code>tbinfo</code>), kmercountexact.sh (from BBMap) (<code>kmer</code>), SAMtools (<code>samtools</code>), and BEDTools (<code>bedtools</code>).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use a reference assembly for the studied species.</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.</p>
+</li>
+<li>
+<p>Now it is time to build the pseudo POPSEQ file (the guide map), which is used as input for the TRITEX pipeline.</p>
+</li>
+<li>
+<p><a href="https://doi.org/10.5447/ipk/2022/20">Here</a> is an example file of how your guide map should look like.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="c1"># Read single-copy regions generated in last step</span><span class="w">
+</span><span class="n">f</span><span class="o">&lt;-</span><span class="s1">'reference_assembly_singlecopy_100bp.bed'</span><span class="w">
+</span><span class="n">fread</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">p</span><span class="w">
+</span><span class="n">setnames</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"agp_chr"</span><span class="p">,</span><span class="w"> </span><span class="s2">"agp_start"</span><span class="p">,</span><span class="w"> </span><span class="s2">"agp_end"</span><span class="p">,</span><span class="w"> </span><span class="s2">"seq"</span><span class="p">))</span><span class="w">
+
+</span><span class="c1"># Change chromosome names to their respective chr numbers</span><span class="w">
+</span><span class="c1"># These are example names from maize</span><span class="w">
+
+</span><span class="n">ids</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"NC_050096.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050097.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050098.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050099.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050100.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050101.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050102.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050103.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050104.1"</span><span class="p">,</span><span class="w">
+         </span><span class="s2">"NC_050105.1"</span><span class="p">)</span><span class="w">
+
+</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">){</span><span class="w">
+  </span><span class="n">p</span><span class="p">[</span><span class="n">grepl</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">agp_chr</span><span class="p">),</span><span class="w"> </span><span class="n">agp_chr</span><span class="o">:=</span><span class="nf">as.integer</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="c1"># This is for unplaced scaffolds, assigning them as "NA"</span><span class="w">
+</span><span class="n">p</span><span class="p">[</span><span class="n">grepl</span><span class="p">(</span><span class="s2">"NW"</span><span class="p">,</span><span class="w"> </span><span class="n">agp_chr</span><span class="p">),</span><span class="w"> </span><span class="n">agp_chr</span><span class="o">:=</span><span class="nf">as.integer</span><span class="p">(</span><span class="kc">NA</span><span class="p">)]</span><span class="w">
+
+</span><span class="n">p</span><span class="p">[,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">css_contig</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span><span class="w"> </span><span class="n">popseq_cM</span><span class="o">=</span><span class="p">(</span><span class="n">agp_start</span><span class="o">+</span><span class="n">agp_end</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="o">/</span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="c1">#set pseudo-cM as Mb position</span><span class="w">
+    </span><span class="n">sorted_genome</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.character</span><span class="p">(</span><span class="kc">NA</span><span class="p">),</span><span class="w">
+    </span><span class="n">css_contig_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">agp_end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">agp_start</span><span class="p">,</span><span class="w">
+    </span><span class="n">popseq_alphachr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">as.character</span><span class="p">(</span><span class="n">agp_chr</span><span class="p">),</span><span class="w"> </span><span class="c1"># it needs to be character column</span><span class="w">
+    </span><span class="n">sorted_arm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NA</span><span class="p">)</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">pp</span><span class="w">
+
+</span><span class="n">pp</span><span class="p">[,</span><span class="n">popseq_chr</span><span class="o">:=</span><span class="nf">as.integer</span><span class="p">(</span><span class="n">popseq_alphachr</span><span class="p">)]</span><span class="w">
+</span><span class="n">pp</span><span class="p">[,</span><span class="w"> </span><span class="n">sorted_alphachr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">popseq_alphachr</span><span class="p">]</span><span class="w">
+</span><span class="n">pp</span><span class="p">[,</span><span class="w"> </span><span class="n">sorted_chr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">popseq_chr</span><span class="p">]</span><span class="w">
+</span><span class="n">pp</span><span class="p">[,</span><span class="w"> </span><span class="n">sorted_lib</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">popseq_alphachr</span><span class="p">]</span><span class="w">
+
+</span><span class="c1"># Save as RDS file for use in TRITEX pipeline</span><span class="w">
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span><span class="w"> </span><span class="s2">"project_name_pseudopopseq.Rds"</span><span class="p">)</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mapping_the_guide_map_sequences_to_the_genome">3.3. Mapping the guide map sequences to the genome</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Independently of how you obtained your guide map, you should map the marker sequences to the contig assembly.</p>
+</li>
+<li>
+<p>The output PAF file will be input into R into the next step.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nv">minimap</span><span class="o">=</span><span class="s1">'/opt/Bio/minimap2/2.17/bin/minimap2'</span>
+<span class="nv">ref</span><span class="o">=</span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg.fa'</span>
+<span class="nv">qry</span><span class="o">=</span><span class="s1">'reference_assembly_singlecopy_100bp.fasta'</span> <span class="c"># this is the guide map sequence file</span>
+<span class="nv">size</span><span class="o">=</span><span class="s1">'20G'</span>
+<span class="nv">mem</span><span class="o">=</span><span class="s1">'5G'</span>
+<span class="nv">threads</span><span class="o">=</span>30
+<span class="nv">prefix</span><span class="o">=</span><span class="k">${</span><span class="nv">ref</span>:t:r<span class="k">}</span>_project_name
+
+<span class="o">{</span>
+<span class="nv">$minimap</span> <span class="nt">-t</span> <span class="nv">$threads</span> <span class="nt">-2</span> <span class="nt">-I</span> <span class="nv">$size</span> <span class="nt">-K</span><span class="nv">$mem</span> <span class="nt">-x</span> asm5 <span class="nv">$ref</span> <span class="nv">$qry</span> | bgzip <span class="o">&gt;</span> <span class="nv">$prefix</span>.paf.gz
+<span class="o">}</span> 2&gt; <span class="nv">$prefix</span>.err &amp;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creating_the_assembly_object">4. Creating the assembly object</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Now we are going to load the contig assembly, guide map and the Hi-C alignment records into R to create the assembly object.</p>
+</li>
+<li>
+<p>All subsequent steps should be carried out in the working directory <code>$projectdir/pseudomolecules/</code>.</p>
+</li>
+<li>
+<p>First load all the necessary datasets into R.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="c1"># Load the R functions for pseudomolecule construction.</span><span class="w">
+</span><span class="n">source</span><span class="p">(</span><span class="s2">"$bitbucket/R/pseudomolecule_construction.R"</span><span class="p">)</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="c1"># Import the guide map.</span><span class="w">
+</span><span class="n">readRDS</span><span class="p">(</span><span class="s1">'$projectdir/project_name_pseudopopseq.Rds'</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">popseq</span><span class="w">
+
+</span><span class="c1"># Read contig lengths</span><span class="w">
+</span><span class="n">f</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg.fa.fai'</span><span class="w">
+</span><span class="n">fread</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">head</span><span class="o">=</span><span class="nb">F</span><span class="p">,</span><span class="w"> </span><span class="n">select</span><span class="o">=</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">col.names</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s2">"scaffold"</span><span class="p">,</span><span class="w"> </span><span class="s2">"length"</span><span class="p">))</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fai</span><span class="w">
+
+</span><span class="c1"># Read guide map alignment.</span><span class="w">
+</span><span class="n">f</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name/project_name_ctg.paf.gz'</span><span class="w"> <i class="conum" data-value="2"></i><b>(2)</b>
+</span><span class="n">read_morexaln_minimap</span><span class="p">(</span><span class="n">paf</span><span class="o">=</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">popseq</span><span class="o">=</span><span class="n">popseq</span><span class="p">,</span><span class="w"> </span><span class="n">minqual</span><span class="o">=</span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">minlen</span><span class="o">=</span><span class="m">500</span><span class="p">,</span><span class="w"> </span><span class="n">prefix</span><span class="o">=</span><span class="nb">F</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">morexaln</span><span class="w"> <i class="conum" data-value="3"></i><b>(3)</b>
+
+</span><span class="c1"># Read Hi-C links</span><span class="w">
+</span><span class="n">dir</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/hic'</span><span class="w">
+</span><span class="n">fread</span><span class="p">(</span><span class="n">paste</span><span class="p">(</span><span class="s1">'find'</span><span class="p">,</span><span class="w"> </span><span class="n">dir</span><span class="p">,</span><span class="w"> </span><span class="s1">'| grep "fragment_pairs.tsv.gz$" | xargs zcat'</span><span class="p">),</span><span class="w">
+       </span><span class="n">header</span><span class="o">=</span><span class="nb">F</span><span class="p">,</span><span class="w"> </span><span class="n">col.names</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s2">"scaffold1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"pos1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"scaffold2"</span><span class="p">,</span><span class="w"> </span><span class="s2">"pos2"</span><span class="p">))</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fpairs</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Note that <code>$bitbucket</code>, <code>$projectdir</code> and <code>$assembly</code> will not be evaluated as variables by R here and in all other instances below. Replace them always with a correct path by modifying the command with a text editor before running it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Note that IDs in this file should be the same as in the guide map. Modify them if needed.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Change the <code>minlen</code> parameter depending on the length of the guide map marker size.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Now initialize and save the assembly.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="c1"># Init and save assembly, replace species with the right one. Here we are going to use "maize".</span><span class="w">
+</span><span class="n">init_assembly</span><span class="p">(</span><span class="n">fai</span><span class="o">=</span><span class="n">fai</span><span class="p">,</span><span class="w"> </span><span class="n">cssaln</span><span class="o">=</span><span class="n">morexaln</span><span class="p">,</span><span class="w"> </span><span class="n">fpairs</span><span class="o">=</span><span class="n">fpairs</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">assembly</span><span class="w">
+</span><span class="n">anchor_scaffolds</span><span class="p">(</span><span class="n">assembly</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">assembly</span><span class="p">,</span><span class="w"> </span><span class="n">popseq</span><span class="o">=</span><span class="n">popseq</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">assembly</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span><span class="n">add_hic_cov</span><span class="p">(</span><span class="n">assembly</span><span class="p">,</span><span class="w"> </span><span class="n">binsize</span><span class="o">=</span><span class="m">1e4</span><span class="p">,</span><span class="w"> </span><span class="n">binsize2</span><span class="o">=</span><span class="m">1e6</span><span class="p">,</span><span class="w">
+	</span><span class="n">minNbin</span><span class="o">=</span><span class="m">50</span><span class="p">,</span><span class="w"> </span><span class="n">innerDist</span><span class="o">=</span><span class="m">3e5</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">assembly</span><span class="w">  <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b>
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">assembly</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly.Rds"</span><span class="p">)</span><span class="w"> <i class="conum" data-value="4"></i><b>(4)</b>
+</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Possible values for the species parameter are: 'barley', 'wheat' (works for A genome species, <em>T. turgidum</em> and <em>T. aestivum</em>), 'maize', 'rye', 'oats_new' (chromosomes 1 to 7, subgenomes A, B and D), 'avena_barbata', 'hordeum_bulbosum', 'faba_bean', and 'lolium'. More species can be accomodated by re-defining the function <code>chrNames()</code>. Type chrNames to see its source code. The only use of species is to map numeric chromosome IDs to proper names, e.g. 1 to 1H in barley (see the note by
+<a href="https://wheat.pw.usda.gov/ggpages/bgn/26/text261a.html">Linde-Laursen</a> to see why this makes a difference) or 21 to 7D.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Change number of cores according to match your allocated resources. Don&#8217;t forget to change it in the next steps also.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>binsize</code> is the resolution at which physical coverage is calculated. <code>binsize2</code> is the size of batches for parallelization; smaller values decrease memory consumption.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>It is recommended to prefix the names of the RDS files created in this and later steps with the current date (e.g. "220801_assembly.Rds") to distinguish different versions.</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_breaking_chimeric_scaffolds">4.1. Breaking chimeric scaffolds</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Generate diagnostic plots to check for chimeras in the input assembly. If sequences from different chromosomes are joined, the chimeric scaffolds will have guide map markers from more than one chromosome.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="c1"># Create diagnostic plots for contigs longer than 1 Mb.</span><span class="w">
+</span><span class="n">assembly</span><span class="o">$</span><span class="n">info</span><span class="p">[</span><span class="n">length</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">length</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span><span class="n">plot_chimeras</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly</span><span class="p">,</span><span class="w"> </span><span class="n">scaffolds</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w">
+	</span><span class="n">refname</span><span class="o">=</span><span class="s2">"B73"</span><span class="p">,</span><span class="w"> </span><span class="n">autobreaks</span><span class="o">=</span><span class="nb">F</span><span class="p">,</span><span class="w"> </span><span class="n">mbscale</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly_1Mb.pdf"</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">)</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="c1"># Diagnostic plots for putative chimeras with strong drops in Hi-C coverage.</span><span class="w">
+</span><span class="n">assembly</span><span class="o">$</span><span class="n">info</span><span class="p">[</span><span class="n">length</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">1e6</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">mri</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">-3</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">length</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span><span class="n">plot_chimeras</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly</span><span class="p">,</span><span class="w"> </span><span class="n">scaffolds</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w">
+	</span><span class="n">refname</span><span class="o">=</span><span class="s2">"B73"</span><span class="p">,</span><span class="w"> </span><span class="n">autobreaks</span><span class="o">=</span><span class="nb">F</span><span class="p">,</span><span class="w"> </span><span class="n">mbscale</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly_chimeras.pdf"</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Don&#8217;t forget to change species and reference name.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Check the plots and search for drops in Hi-C coverage, misalignments and chimeras. For each case, assign the PDF page and scaffold position which needs breaking.</p>
+</li>
+<li>
+<p>For instance, in <a href="https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/example_assembly_1Mb.pdf">this example</a>, the scaffolds that need to be broken are on pages 3, 6, and 9. We need to change the bin region on the code for each scaffold, like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">assembly</span><span class="o">$</span><span class="n">info</span><span class="p">[</span><span class="n">length</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">length</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">ss</span><span class="w">
+
+ </span><span class="n">i</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="c1"># page number in PDF</span><span class="w">
+ </span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">$</span><span class="n">scaffold</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="w">
+ </span><span class="c1"># change the bin position observed in the plots</span><span class="w">
+ </span><span class="n">assembly</span><span class="o">$</span><span class="n">cov</span><span class="p">[</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s1">'scaffold'</span><span class="p">][</span><span class="n">bin</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">10e6</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bin</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">22e6</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="n">r</span><span class="p">)][</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">bin</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">
+
+ </span><span class="n">i</span><span class="o">=</span><span class="m">6</span><span class="w"> </span><span class="c1"># page number in PDF</span><span class="w">
+ </span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">$</span><span class="n">scaffold</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="w">
+ </span><span class="n">rbind</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">$</span><span class="n">cov</span><span class="p">[</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s1">'scaffold'</span><span class="p">][</span><span class="n">bin</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">40e6</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bin</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">45e6</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="n">r</span><span class="p">)][</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">bin</span><span class="p">)])</span><span class="o">-&gt;</span><span class="n">b</span><span class="w">
+
+ </span><span class="n">i</span><span class="o">=</span><span class="m">9</span><span class="w"> </span><span class="c1"># page number in PDF</span><span class="w">
+ </span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">$</span><span class="n">scaffold</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="w">
+ </span><span class="n">rbind</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">$</span><span class="n">cov</span><span class="p">[</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s1">'scaffold'</span><span class="p">][</span><span class="n">bin</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">1e6</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bin</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">9e6</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="n">r</span><span class="p">)][</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">bin</span><span class="p">)])</span><span class="o">-&gt;</span><span class="n">b</span><span class="w">
+
+</span><span class="c1"># And so on.</span><span class="w">
+
+</span><span class="c1"># Rename column and plot again to double-check the breakpoints are correct</span><span class="w">
+</span><span class="n">setnames</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="s2">"bin"</span><span class="p">,</span><span class="w"> </span><span class="s2">"br"</span><span class="p">)</span><span class="w">
+</span><span class="n">plot_chimeras</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly</span><span class="p">,</span><span class="w"> </span><span class="n">scaffolds</span><span class="o">=</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">br</span><span class="o">=</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w">
+	</span><span class="n">refname</span><span class="o">=</span><span class="s2">"B73"</span><span class="p">,</span><span class="w">  </span><span class="n">mbscale</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly_chimeras_final.pdf"</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">)</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>After checking if the break points are in the right places, proceed with breaking the scaffolds.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">break_scaffolds</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="p">,</span><span class="w"> </span><span class="n">prefix</span><span class="o">=</span><span class="s2">"contig_corrected_v1_"</span><span class="p">,</span><span class="w"> </span><span class="n">slop</span><span class="o">=</span><span class="m">1e4</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">assembly_v2</span><span class="w">
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">assembly_v2</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly_v2.Rds"</span><span class="p">)</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This will create a new file for the assembly.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Now we make the Hi-C map. Three files will be generated: a PDF with the intrachromosomal plots, a PDF with the interchromosomal plots, and a file to be loaded into R Shiny Map inspector (<code>*_export.Rds</code>).</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">fbed</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg_MboI_fragments_30bp.bed'</span><span class="w">
+</span><span class="n">read_fragdata</span><span class="p">(</span><span class="n">info</span><span class="o">=</span><span class="n">assembly_v2</span><span class="o">$</span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="n">fbed</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">frag_data</span><span class="w">
+
+</span><span class="c1"># Consider only contigs &gt;= 1 Mb first</span><span class="w">
+</span><span class="n">frag_data</span><span class="o">$</span><span class="n">info</span><span class="p">[</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">hic_chr</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">nfrag</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">,</span><span class="w"> </span><span class="n">chr</span><span class="o">=</span><span class="n">hic_chr</span><span class="p">,</span><span class="w"> </span><span class="n">cM</span><span class="o">=</span><span class="n">popseq_cM</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_info</span><span class="w">
+
+</span><span class="n">hic_map</span><span class="p">(</span><span class="n">info</span><span class="o">=</span><span class="n">hic_info</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v2</span><span class="p">,</span><span class="w"> </span><span class="n">frags</span><span class="o">=</span><span class="n">frag_data</span><span class="o">$</span><span class="n">bed</span><span class="p">,</span><span class="w">
+	</span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">ncores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="n">min_nfrag_scaffold</span><span class="o">=</span><span class="m">30</span><span class="p">,</span><span class="w">
+	</span><span class="n">max_cM_dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="p">,</span><span class="w"> </span><span class="n">binsize</span><span class="o">=</span><span class="m">2e5</span><span class="p">,</span><span class="w"> </span><span class="n">min_nfrag_bin</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">gap_size</span><span class="o">=</span><span class="m">100</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v1</span><span class="w">
+
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">hic_map_v1</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"hic_map_v1.Rds"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Make the Hi-C plots, files will be placed in your working directory.</span><span class="w">
+</span><span class="n">snuc</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg_MboI_fragments_30bp_split.nuc.txt'</span><span class="w">
+
+</span><span class="n">hic_plots</span><span class="p">(</span><span class="n">rds</span><span class="o">=</span><span class="s2">"hic_map_v1.Rds"</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v2</span><span class="p">,</span><span class="w">
+	</span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">nuc</span><span class="o">=</span><span class="n">snuc</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v2</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Let&#8217;s do a second round of checking for chimeras. Broken scaffolds in the last step are renamed in the plots. It might not be necessary to break any more scaffolds; in this case, just check the plots and if everything is alright, proceed to step 8.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="c1"># If you'd like to  plot specific contigs:</span><span class="w">
+</span><span class="n">data.table</span><span class="p">(</span><span class="n">scaffold</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s1">'contig_corrected_v1_53'</span><span class="p">,</span><span class="w"> </span><span class="s1">'contig_corrected_v1_24'</span><span class="p">,</span><span class="w">
+	</span><span class="s1">'contig_corrected_v1_5'</span><span class="p">,</span><span class="w"> </span><span class="s1">'contig_corrected_v1_76'</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">ss</span><span class="w">
+
+</span><span class="c1"># If you'd like to check them all again:</span><span class="w">
+</span><span class="n">assembly_v2</span><span class="o">$</span><span class="n">info</span><span class="p">[</span><span class="n">length</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">length</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">ss</span><span class="w">
+
+</span><span class="n">plot_chimeras</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v2</span><span class="p">,</span><span class="w"> </span><span class="n">scaffolds</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span><span class="w">
+        </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">refname</span><span class="o">=</span><span class="s2">"B73"</span><span class="p">,</span><span class="w"> </span><span class="n">autobreaks</span><span class="o">=</span><span class="nb">F</span><span class="p">,</span><span class="w">
+        </span><span class="n">mbscale</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly_v2_chimeras.pdf"</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># In case there are more chimeras, proceed like the previous step. Assign `i` with the PDF page and don't forget to change the bin.</span><span class="w">
+
+</span><span class="n">i</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="c1"># PDF page</span><span class="w">
+</span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">$</span><span class="n">scaffold</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span><span class="n">assembly_v2</span><span class="o">$</span><span class="n">cov</span><span class="p">[</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s1">'scaffold'</span><span class="p">][</span><span class="n">bin</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">6e7</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bin</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">8e7</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="n">r</span><span class="p">)][</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">bin</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">
+
+</span><span class="n">i</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="c1"># PDF page</span><span class="w">
+</span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">$</span><span class="n">scaffold</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span><span class="n">rbind</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">assembly_v2</span><span class="o">$</span><span class="n">cov</span><span class="p">[</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s1">'scaffold'</span><span class="p">][</span><span class="n">bin</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">8e7</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">bin</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">10e7</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="n">r</span><span class="p">)][</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">bin</span><span class="p">)])</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">b</span><span class="w">
+
+</span><span class="n">setnames</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="s2">"bin"</span><span class="p">,</span><span class="w"> </span><span class="s2">"br"</span><span class="p">)</span><span class="w">
+</span><span class="n">plot_chimeras</span><span class="p">(</span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v2</span><span class="p">,</span><span class="w"> </span><span class="n">scaffolds</span><span class="o">=</span><span class="n">b</span><span class="p">,</span><span class="w">
+	</span><span class="n">br</span><span class="o">=</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">refname</span><span class="o">=</span><span class="s2">"B73"</span><span class="p">,</span><span class="w">  </span><span class="n">mbscale</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w">
+	</span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly_v2_chimeras_final.pdf"</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">)</span><span class="w">
+
+</span><span class="n">break_scaffolds</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">assembly_v2</span><span class="p">,</span><span class="w"> </span><span class="n">prefix</span><span class="o">=</span><span class="s2">"contig_corrected_v2_"</span><span class="p">,</span><span class="w"> </span><span class="n">slop</span><span class="o">=</span><span class="m">1e4</span><span class="p">,</span><span class="w">
+	</span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">assembly_v3</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">assembly_v3</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"assembly_v3.Rds"</span><span class="p">)</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="n">fbed</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg_MboI_fragments_30bp.bed'</span><span class="w">
+</span><span class="n">read_fragdata</span><span class="p">(</span><span class="n">info</span><span class="o">=</span><span class="n">assembly_v3</span><span class="o">$</span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="n">fbed</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">frag_data</span><span class="w">
+
+</span><span class="n">frag_data</span><span class="o">$</span><span class="n">info</span><span class="p">[</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">hic_chr</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">nfrag</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">,</span><span class="w"> </span><span class="n">chr</span><span class="o">=</span><span class="n">hic_chr</span><span class="p">,</span><span class="w"> </span><span class="n">cM</span><span class="o">=</span><span class="n">popseq_cM</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_info</span><span class="w">
+
+</span><span class="n">hic_map</span><span class="p">(</span><span class="n">info</span><span class="o">=</span><span class="n">hic_info</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v3</span><span class="p">,</span><span class="w"> </span><span class="n">frags</span><span class="o">=</span><span class="n">frag_data</span><span class="o">$</span><span class="n">bed</span><span class="p">,</span><span class="w">
+	</span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">ncores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="n">min_nfrag_scaffold</span><span class="o">=</span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">max_cM_dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="p">,</span><span class="w">
+	</span><span class="n">binsize</span><span class="o">=</span><span class="m">2e5</span><span class="p">,</span><span class="w"> </span><span class="n">min_nfrag_bin</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">gap_size</span><span class="o">=</span><span class="m">100</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v2</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">hic_map_v2</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"hic_map_v2.Rds"</span><span class="p">)</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="n">snuc</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name.p_ctg_MboI_fragments_30bp_split.nuc.txt'</span><span class="w">
+</span><span class="n">hic_plots</span><span class="p">(</span><span class="n">rds</span><span class="o">=</span><span class="s2">"hic_map_v2.Rds"</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v3</span><span class="p">,</span><span class="w">
+	</span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">nuc</span><span class="o">=</span><span class="n">snuc</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v2</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Don&#8217;t forget to update assembly and Hi-C map versions.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>If another round of breaking scaffolds is needed, you can just run the previous block again. Don&#8217;t forget to change the output files and object names (assembly_vX, hic_map_vX).</p>
+</li>
+<li>
+<p>If no more chimeras are found, proceed to decreasing the size to 500 kb.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">frag_data</span><span class="o">$</span><span class="n">info</span><span class="p">[</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">hic_chr</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">5e5</span><span class="p">,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">nfrag</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">,</span><span class="w"> </span><span class="n">chr</span><span class="o">=</span><span class="n">hic_chr</span><span class="p">,</span><span class="w"> </span><span class="n">cM</span><span class="o">=</span><span class="n">popseq_cM</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_info</span><span class="w">
+
+</span><span class="n">hic_map</span><span class="p">(</span><span class="n">info</span><span class="o">=</span><span class="n">hic_info</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v3</span><span class="p">,</span><span class="w"> </span><span class="n">frags</span><span class="o">=</span><span class="n">frag_data</span><span class="o">$</span><span class="n">bed</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w">
+	</span><span class="n">ncores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="n">min_nfrag_scaffold</span><span class="o">=</span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">max_cM_dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="p">,</span><span class="w"> </span><span class="n">binsize</span><span class="o">=</span><span class="m">2e5</span><span class="p">,</span><span class="w">
+	</span><span class="n">min_nfrag_bin</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">gap_size</span><span class="o">=</span><span class="m">100</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v3</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">hic_map_v3</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"hic_map_v3.Rds"</span><span class="p">)</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="n">snuc</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name.p_ctg_MboI_fragments_30bp_split.nuc.txt'</span><span class="w">
+</span><span class="n">hic_plots</span><span class="p">(</span><span class="s2">"hic_map_v2.Rds"</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v3</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">40</span><span class="p">,</span><span class="w">
+	</span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">nuc</span><span class="o">=</span><span class="n">snuc</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v3</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+
+</span><span class="c1"># Exporting to Excel the table that will be used for manual curation.</span><span class="w">
+</span><span class="n">write_hic_map</span><span class="p">(</span><span class="n">rds</span><span class="o">=</span><span class="s2">"hic_map_v3.Rds"</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"hic_map_v3.xlsx"</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Don&#8217;t forget to put the correct object name here.</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_manual_curation_of_scaffolds">5. Manual curation of scaffolds</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that we have the scaffolded assembly, we are going to check if there are any inversions, extra contigs, or misplaced contigs. To do so, we can check the Hi-C plots generated in the last step coupled with a collinearity plot of scaffolds (the AGP, <code>hic_map</code> object) to the guide map. It is also possible to use the R Shiny Map Inspector app to zoom in the Hi-C intrachromosomal plots to check the contigs that need to be changed.</p>
+</div>
+<div class="sect2">
+<h3 id="_collinearity_plots">5.1. Collinearity plots</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>This step is optional, yet recommended. It will help spot inverted or misplaced contigs. The collinearity plots will show marker positions and against the assembly. It is possible to check the alignments and spot inverted/misplaced contigs. You can do this anytime you want to check the collinearity.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">assembly_v3</span><span class="o">$</span><span class="n">cssaln</span><span class="p">[</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">mb</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">pos</span><span class="p">,</span><span class="w"> </span><span class="n">guide_chr</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="s2">"chr"</span><span class="p">,</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="n">popseq_alphachr</span><span class="p">),</span><span class="w"> </span><span class="n">guide_pos</span><span class="o">=</span><span class="n">mb</span><span class="o">*</span><span class="m">1e6</span><span class="p">)]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">x</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span><span class="n">hic_map_v3</span><span class="o">$</span><span class="n">agp</span><span class="p">[,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">scaffold</span><span class="p">,</span><span class="w"> </span><span class="n">agp_start</span><span class="p">,</span><span class="w"> </span><span class="n">agp_end</span><span class="p">,</span><span class="w"> </span><span class="n">orientation</span><span class="p">,</span><span class="w"> </span><span class="n">agp_chr</span><span class="p">)][</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s2">"scaffold"</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">x</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+
+</span><span class="c1"># Lift alignment positions to pseudomolecule positions</span><span class="w">
+</span><span class="n">x</span><span class="p">[</span><span class="n">orientation</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">agp_pos</span><span class="w"> </span><span class="o">:=</span><span class="w">  </span><span class="n">agp_start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pos</span><span class="p">]</span><span class="w">
+</span><span class="n">x</span><span class="p">[</span><span class="n">orientation</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">-1</span><span class="p">,</span><span class="w"> </span><span class="n">agp_pos</span><span class="w"> </span><span class="o">:=</span><span class="w">  </span><span class="n">agp_end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">pos</span><span class="p">]</span><span class="w">
+
+</span><span class="c1"># Chromosome-wise plot</span><span class="w">
+</span><span class="n">x</span><span class="p">[</span><span class="n">agp_chr</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">guide_chr</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">x</span><span class="w">
+</span><span class="n">pdf</span><span class="p">(</span><span class="s2">"hic_map_v3_vs_assembly_v3.pdf"</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="o">=</span><span class="m">3</span><span class="o">*</span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="o">=</span><span class="m">3</span><span class="o">*</span><span class="m">3</span><span class="p">)</span><span class="w">
+</span><span class="n">par</span><span class="p">(</span><span class="n">mar</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="m">5</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">3</span><span class="p">))</span><span class="w">
+</span><span class="n">lapply</span><span class="p">(</span><span class="n">chrNames</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">agp</span><span class="o">=</span><span class="nb">T</span><span class="p">)</span><span class="o">$</span><span class="n">agp_chr</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">21</span><span class="p">],</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">i</span><span class="p">){</span><span class="w">
+  </span><span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w">
+  </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">pch</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span><span class="w"> </span><span class="n">main</span><span class="o">=</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">agp_pos</span><span class="o">/</span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">guide_pos</span><span class="o">/</span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">xlab</span><span class="o">=</span><span class="s2">"Hi-C AGP (Mb)"</span><span class="p">,</span><span class="w"> </span><span class="n">ylab</span><span class="o">=</span><span class="s2">"guide (Mb)"</span><span class="p">,</span><span class="w"> </span><span class="n">las</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">bty</span><span class="o">=</span><span class="s1">'l'</span><span class="p">),</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s2">"agp_chr"</span><span class="p">]</span><span class="w">
+
+  </span><span class="c1"># Draw contig boundaries, use correct hic_map version here</span><span class="w">
+  </span><span class="n">hic_map_v3</span><span class="o">$</span><span class="n">agp</span><span class="p">[</span><span class="n">agp_chr</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">gap</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">T</span><span class="p">][,</span><span class="w"> </span><span class="n">abline</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">agp_start</span><span class="o">/</span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">)]</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span><span class="p">})</span><span class="w">
+</span><span class="n">dev.off</span><span class="p">()</span><span class="w">
+</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Don&#8217;t forget to change objects' names.</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_checking_hi_c_maps">5.2. Checking Hi-C maps</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>We can use Map Inspector Shiny app or the intrachromosomal plots for manual curation. Genomic regions containing putatively chimeric scaffolds can be clicked on to get their names and pinpoint the sites of culpable misjoins.</p>
+</li>
+<li>
+<p>The source code required for deploying Hi-C Map Inspector on an R Shiny server is contained in <code>$bitbucket/R/map_inspector.Rmd</code>. You need to modify the paths to the data directory and the default map object.</p>
+</li>
+<li>
+<p>You&#8217;ll want to check for inversions near scaffold borders (grey lines).</p>
+</li>
+<li>
+<p>When modifications are spotted, change the Excel file generated in the last steps. If an inverted contig is spotted, the column "new_orientation" on the table must be changed (Fig. 2A). On the other hand, if there is a misplaced/extra contig, the row containing it should be move (don&#8217;t forget to change the bin number order) (Fig. 2B).</p>
+</li>
+</ol>
+</div>
+<div id="img-manual" class="imageblock">
+<div class="content">
+<img src="https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/manual_curation.jpg" alt="manual curation">
+</div>
+<div class="title">Figure 2. Manual curation in the TRITEX’s correct-map-inspect cycle. <strong>(A)</strong> The Hi-C contacts show a pattern indicative of an inversion in the terminal contig. The orientation is swapped in the Excel table and a new Hi-C matrix is computed with the updated configuration. The revised Hi-C matrix has fewer off-diagonal signals. <strong>(B)</strong> Hi-C contacts show a pattern indicative of a misplaced contig. The order of the final two rows is reversed in the Excel table and the Hi-C matrix is computed with the new configuration. The revised Hi-C matrix has fewer off-diagonal signals.</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>After making the changes, import the Excel file again and proceed with mapping.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">read_hic_map</span><span class="p">(</span><span class="n">rds</span><span class="o">=</span><span class="s2">"hic_map_v3.Rds"</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"hic_map_v3_edit.xlsx"</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">nmap</span><span class="w">
+</span><span class="n">diff_hic_map</span><span class="p">(</span><span class="n">rds</span><span class="o">=</span><span class="s2">"hic_map_v3.Rds"</span><span class="p">,</span><span class="w"> </span><span class="n">nmap</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">)</span><span class="w">
+</span><span class="n">hic_map</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">agp_only</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">map</span><span class="o">=</span><span class="n">nmap</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v4</span><span class="w">
+
+</span><span class="n">saveRDS</span><span class="p">(</span><span class="n">hic_map_v4</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"hic_map_v4.Rds"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Final Hi-C plots. You can check if the inverted scaffolds are correct.</span><span class="w">
+</span><span class="n">snuc</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name.p_ctg_MboI_fragments_30bp_split.nuc.txt'</span><span class="w">
+</span><span class="n">hic_plots</span><span class="p">(</span><span class="n">rds</span><span class="o">=</span><span class="s2">"hic_map_v4.Rds"</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v3</span><span class="p">,</span><span class="w">
+	</span><span class="n">cores</span><span class="o">=</span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="s2">"maize"</span><span class="p">,</span><span class="w"> </span><span class="n">nuc</span><span class="o">=</span><span class="n">snuc</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">hic_map_v4</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>If there are still wrong contigs, you can make new modifications to the Excel file and repeat this block until there are no more changes needed. You can make another <a href="#_collinearity_plots">collinearity plot</a> to help you.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_compiling_pseudomolecules">6. Compiling pseudomolecules</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>First let&#8217;s get some stats of the pseudomolecules.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">hic_map_v4</span><span class="o">$</span><span class="n">agp</span><span class="p">[</span><span class="n">agp_chr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s2">"chrUn"</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">gap</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">F</span><span class="p">][,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="s2">"Ncontig"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">.N</span><span class="p">,</span><span class="w">
+	</span><span class="s2">"N50 (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="n">n50</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e6</span><span class="p">),</span><span class="w"> </span><span class="m">1</span><span class="p">),</span><span class="w">
+	</span><span class="s2">"max_length (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e6</span><span class="p">),</span><span class="m">1</span><span class="p">),</span><span class="w">
+	</span><span class="s2">"min_length (kb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="nf">min</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e3</span><span class="p">),</span><span class="m">1</span><span class="p">)),</span><span class="w"> </span><span class="n">key</span><span class="o">=</span><span class="n">agp_chr</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">res</span><span class="w">
+</span><span class="n">hic_map_v4</span><span class="o">$</span><span class="n">chrlen</span><span class="p">[,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">agp_chr</span><span class="p">,</span><span class="w"> </span><span class="s2">"length (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="n">length</span><span class="o">/</span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">))][</span><span class="n">res</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s2">"agp_chr"</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">res</span><span class="w">
+</span><span class="n">setnames</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="w"> </span><span class="s2">"agp_chr"</span><span class="p">,</span><span class="w"> </span><span class="s2">"chr"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">hic_map_v4</span><span class="o">$</span><span class="n">agp</span><span class="p">[</span><span class="n">gap</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">F</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">agp_chr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s2">"chrUn"</span><span class="p">][,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="s2">"Ncontig"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">.N</span><span class="p">,</span><span class="w">
+	</span><span class="s2">"N50 (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="n">n50</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e6</span><span class="p">),</span><span class="w"> </span><span class="m">1</span><span class="p">),</span><span class="w">
+	</span><span class="s2">"max_length (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e6</span><span class="p">),</span><span class="m">1</span><span class="p">),</span><span class="w">
+	</span><span class="s2">"min_length (kb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="nf">min</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e3</span><span class="p">),</span><span class="m">1</span><span class="p">))][,</span><span class="w"> </span><span class="n">agp_chr</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s2">"1-10"</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">res2</span><span class="w">
+</span><span class="n">hic_map_v4</span><span class="o">$</span><span class="n">chrlen</span><span class="p">[,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">agp_chr</span><span class="o">=</span><span class="s2">"1-10"</span><span class="p">,</span><span class="w"> </span><span class="s2">"length (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="nf">sum</span><span class="p">(</span><span class="n">length</span><span class="p">)</span><span class="o">/</span><span class="m">1e6</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">))][</span><span class="n">res2</span><span class="p">,</span><span class="w"> </span><span class="n">on</span><span class="o">=</span><span class="s2">"agp_chr"</span><span class="p">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">res2</span><span class="w">
+</span><span class="n">setnames</span><span class="p">(</span><span class="n">res2</span><span class="p">,</span><span class="w"> </span><span class="s2">"agp_chr"</span><span class="p">,</span><span class="w"> </span><span class="s2">"chr"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">hic_map_v4</span><span class="o">$</span><span class="n">agp</span><span class="p">[</span><span class="n">gap</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">F</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">agp_chr</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"chrUn"</span><span class="p">][,</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">chr</span><span class="o">=</span><span class="s2">"un"</span><span class="p">,</span><span class="w"> </span><span class="s2">"Ncontig"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">.N</span><span class="p">,</span><span class="w">
+	</span><span class="s2">"N50 (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="n">n50</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e6</span><span class="p">),</span><span class="w"> </span><span class="m">1</span><span class="p">),</span><span class="w">
+	</span><span class="s2">"max_length (Mb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e6</span><span class="p">),</span><span class="m">1</span><span class="p">),</span><span class="w">
+	</span><span class="s2">"min_length (kb)"</span><span class="o">=</span><span class="nf">round</span><span class="p">(</span><span class="nf">min</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e3</span><span class="p">),</span><span class="m">1</span><span class="p">),</span><span class="w">
+	</span><span class="s2">"length (Mb)"</span><span class="o">=</span><span class="nf">sum</span><span class="p">(</span><span class="n">scaffold_length</span><span class="o">/</span><span class="m">1e6</span><span class="p">))]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">res3</span><span class="w">
+
+</span><span class="n">rbind</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="w"> </span><span class="n">res2</span><span class="p">,</span><span class="w"> </span><span class="n">res3</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">res</span><span class="w">
+
+</span><span class="n">write.xlsx</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"hic_map_v4_pseudomolecule_stats.xlsx"</span><span class="p">)</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>And finally compile the pseudomolecules. The FASTA file will be placed inside the directory assigned in "output".</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="R"><span class="n">fasta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s1">'$projectdir/assembly/project_name/project_name.p_ctg.fa'</span><span class="w">
+</span><span class="n">sink</span><span class="p">(</span><span class="s2">"pseudomolecules_v1.log"</span><span class="p">)</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span><span class="n">compile_psmol</span><span class="p">(</span><span class="n">fasta</span><span class="o">=</span><span class="n">fasta</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="o">=</span><span class="s2">"pseudomolecules_v1"</span><span class="p">,</span><span class="w">
+	</span><span class="n">hic_map</span><span class="o">=</span><span class="n">hic_map_v4</span><span class="p">,</span><span class="w"> </span><span class="n">assembly</span><span class="o">=</span><span class="n">assembly_v3</span><span class="p">,</span><span class="w"> </span><span class="n">cores</span><span class="o">=</span><span class="m">30</span><span class="p">)</span><span class="w">
+</span><span class="n">sink</span><span class="p">()</span><span class="w"> <i class="conum" data-value="1"></i><b>(1)</b>
+</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>That opens and closes a log file.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2022-12-15 15:16:29 +0100
+</div>
+</div>
+</body>
+</html>
