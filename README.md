@@ -89,9 +89,8 @@ In case of questions on the pipeline, contact [Martin Mascher](mailto:mascher@ip
 6. Clone the Bitbucket [repository](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/src/master/) of the TRITEX assembly pipeline. The path to the local copy of the repository will be referenced by `$bitbucket` in the code listings.
 7. The scripts used below have parameters such as `--bedtools` or `--samtools` (indicated in the code listings) to specify the absolute paths to the required executables. For better readability, they are omitted from the commands.
 
-|  |  |
-| --- | --- |
-|  | Instead of specifying the paths each time you call the scripts, you may also edit the scripts and modify the default paths. We chose not to use executables in `$PATH` to enforce proper documentation of software versions. |
+
+| Instead of specifying the paths each time you call the scripts, you may also edit the scripts and modify the default paths. We chose not to use executables in `$PATH` to enforce proper documentation of software versions. |
 
 ### Setting up the folder structure
 
@@ -131,15 +130,15 @@ The project folder should have the following subdirectory structure. At the star
 
    reads='hifi_reads.txt'
    prefix='project_name'
-   threads=30 **(1)**
-
+   threads=30 (1)
+   
    mkdir $prefix
    out=$prefix/$prefix
 
    xargs -a $reads hifiasm -t $threads -o $out > $out.out 2> $out.err
    ```
 
-   | **1** | Set the number of threads you would like to use. |
+   **1** | Set the number of threads you would like to use. |
 3. Check the stats of contigs and unitigs.
 
    ```
@@ -152,9 +151,7 @@ The project folder should have the following subdirectory structure. At the star
    | tr : '\t' | $bitbucket/shell/n50 > project_name.p_utg.noseq.n50
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | The backslash \ will be used throughout the tutorial to break long shell commands into several lines. When pasting the commands or editing them, make sure that no white space follows the backslash. Otherwise, the shell will interpret the lines as belonging to different commands. Also multi-line commands do not tolerate intervening command line (starting with the hash sign #). |
+   **1** | The backslash \ will be used throughout the tutorial to break long shell commands into several lines. When pasting the commands or editing them, make sure that no white space follows the backslash. Otherwise, the shell will interpret the lines as belonging to different commands. Also multi-line commands do not tolerate intervening command line (starting with the hash sign #). |
 4. Convert contig GFA to FASTA and change contig names.
 
    ```
@@ -162,9 +159,7 @@ The project folder should have the following subdirectory structure. At the star
    gfatools gfa2fa $gfa | seqtk rename - contig_ > ${gfa:r}.fa (1)
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | The syntax `${gfa:r}` is specific to the Z shell, see the section of the shell manual on [expansion and substitution](https://linux.die.net/man/1/zshexpn). Very usefyl are `:r` and `:t` modifiers to remove filename extensions and leading pathname components, respectively. The latter works like the UNIX command `basename`. |
+   **1** | The syntax `${gfa:r}` is specific to the Z shell, see the section of the shell manual on [expansion and substitution](https://linux.die.net/man/1/zshexpn). Very usefyl are `:r` and `:t` modifiers to remove filename extensions and leading pathname components, respectively. The latter works like the UNIX command `basename`. |
 
 ## 2. Mapping Hi-C data
 
@@ -177,11 +172,9 @@ The project folder should have the following subdirectory structure. At the star
    $bitbucket/shell/digest_emboss.zsh --ref $ref --enzyme 'MboI' --sitelen 4 --minlen 30  (2) (3)
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | `$ref` is the renamed FASTA created in the previous step. |
-   | **2** | In the script "digest\_emboss.zsh", change the paths to the executables of `restrict`, `bedtools` and `rebase`. |
-   | **3** | Don’t forget to make sure that the enzyme matches the one used for making your Hi-C libraries. Another common choice is `--enzyme 'DpnII' --sitelen 4`. |
+   **1** | `$ref` is the renamed FASTA created in the previous step. |
+   **2** | In the script "digest\_emboss.zsh", change the paths to the executables of `restrict`, `bedtools` and `rebase`. |
+   **3** | Don’t forget to make sure that the enzyme matches the one used for making your Hi-C libraries. Another common choice is `--enzyme 'DpnII' --sitelen 4`. |
 2. Put the gzipped FASTQ files of the Hi-C reads (or symbolic links to them) of the Hi-C reads in the folder "hic".
 3. Now start the Hi-C mapping.
 
@@ -192,15 +185,13 @@ map='$bitbucket/shell/run_hic_mapping.zsh' (1)
 bed=${ref:r}_MboI_fragments_30bp.bed (2)
 cd $projectdir
 
-$map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $TMPDIR hic  (3) (4)
+$map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $TMPDIR hic (3)(4)
 ```
 
-|  |  |
-| --- | --- |
-| **1** | You need to specify in the script the paths to the following executables: Cutadapt (`--cutadapt`), bgzip (`--bgzip`), Minimap2 (`--minimap`), Novosort (`--novosort`), SAMtools (`--samtools`), and BEDTools (`--bedtools`). |
-| **2** | Use the BED file with the in silico digest for the correct restriction enzyme. Using the wrong enzyme will give wrong results. |
-| **3** | Specify correct linker sequences that is created by ligation of fill-in overhangs during the Hi-C protocol. If HindIII was used, the correct linker is AAGCTAGCTT; if DpnII was used, the linker is GATCGATC. |
-| **4** | The temporary directory needs to be large enough to hold huge BAM files (dozens of GB). |
+**1** | You need to specify in the script the paths to the following executables: Cutadapt (`--cutadapt`), bgzip (`--bgzip`), Minimap2 (`--minimap`), Novosort (`--novosort`), SAMtools (`--samtools`), and BEDTools (`--bedtools`). |
+**2** | Use the BED file with the in silico digest for the correct restriction enzyme. Using the wrong enzyme will give wrong results. |
+**3** | Specify correct linker sequences that is created by ligation of fill-in overhangs during the Hi-C protocol. If HindIII was used, the correct linker is AAGCTAGCTT; if DpnII was used, the linker is GATCGATC. |
+**4** | The temporary directory needs to be large enough to hold huge BAM files (dozens of GB). |
 
 ## 3. Creating the guide map table
 
@@ -249,10 +240,8 @@ awk '$3 - $2 >= 100' $bed | grep -v chrUn | awk '{print $0"\tseq_"NR}' \
  | tee $out.bed | bedtools getfasta -fi $fa -bed /dev/stdin -name -fo $out.fasta
 ```
 
-|  |  |
-| --- | --- |
-| **1** | You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`). |
-| **2** | Use a reference assembly for the studied species. |
+**1** | You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`). |
+**2** | Use a reference assembly for the studied species. |
 
 1. Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.
 2. Now it is time to build the pseudo POPSEQ file (the guide map), which is used as input for the TRITEX pipeline.
@@ -346,11 +335,9 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
           header=F, col.names=c("scaffold1", "pos1", "scaffold2", "pos2")) -> fpairs
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | Note that `$bitbucket`, `$projectdir` and `$assembly` will not be evaluated as variables by R here and in all other instances below. Replace them always with a correct path by modifying the command with a text editor before running it. |
-   | **2** | Note that IDs in this file should be the same as in the guide map. Modify them if needed. |
-   | **3** | Change the `minlen` parameter depending on the length of the guide map marker size. |
+   **1** | Note that `$bitbucket`, `$projectdir` and `$assembly` will not be evaluated as variables by R here and in all other instances below. Replace them always with a correct path by modifying the command with a text editor before running it. |
+   **2** | Note that IDs in this file should be the same as in the guide map. Modify them if needed. |
+   **3** | Change the `minlen` parameter depending on the length of the guide map marker size. |
 4. Now initialize and save the assembly.
 
    ```
@@ -362,12 +349,10 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    saveRDS(assembly, file="assembly.Rds") (4)
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | Possible values for the species parameter are: 'barley', 'wheat' (works for A genome species, *T. turgidum* and *T. aestivum*), 'maize', 'rye', 'oats\_new' (chromosomes 1 to 7, subgenomes A, B and D), 'avena\_barbata', 'hordeum\_bulbosum', 'faba\_bean', and 'lolium'. More species can be accomodated by re-defining the function `chrNames()`. Type chrNames to see its source code. The only use of species is to map numeric chromosome IDs to proper names, e.g. 1 to 1H in barley (see the note by [Linde-Laursen](https://wheat.pw.usda.gov/ggpages/bgn/26/text261a.html) to see why this makes a difference) or 21 to 7D. |
-   | **2** | Change number of cores according to match your allocated resources. Don’t forget to change it in the next steps also. |
-   | **3** | `binsize` is the resolution at which physical coverage is calculated. `binsize2` is the size of batches for parallelization; smaller values decrease memory consumption. |
-   | **4** | It is recommended to prefix the names of the RDS files created in this and later steps with the current date (e.g. "220801\_assembly.Rds") to distinguish different versions. |
+   **1** | Possible values for the species parameter are: 'barley', 'wheat' (works for A genome species, *T. turgidum* and *T. aestivum*), 'maize', 'rye', 'oats\_new' (chromosomes 1 to 7, subgenomes A, B and D), 'avena\_barbata', 'hordeum\_bulbosum', 'faba\_bean', and 'lolium'. More species can be accomodated by re-defining the function `chrNames()`. Type chrNames to see its source code. The only use of species is to map numeric chromosome IDs to proper names, e.g. 1 to 1H in barley (see the note by [Linde-Laursen](https://wheat.pw.usda.gov/ggpages/bgn/26/text261a.html) to see why this makes a difference) or 21 to 7D. |
+   **2** | Change number of cores according to match your allocated resources. Don’t forget to change it in the next steps also. |
+   **3** | `binsize` is the resolution at which physical coverage is calculated. `binsize2` is the size of batches for parallelization; smaller values decrease memory consumption. |
+   **4** | It is recommended to prefix the names of the RDS files created in this and later steps with the current date (e.g. "220801\_assembly.Rds") to distinguish different versions. |
 
 ### 4.1. Breaking chimeric scaffolds
 
@@ -385,9 +370,7 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    	refname="B73", autobreaks=F, mbscale=1, file="assembly_chimeras.pdf", cores=40)
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | Don’t forget to change species and reference name. |
+   **1** | Don’t forget to change species and reference name. |
 2. Check the plots and search for drops in Hi-C coverage, misalignments and chimeras. For each case, assign the PDF page and scaffold position which needs breaking.
 3. For instance, in [this example](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/example_assembly_1Mb.pdf), the scaffolds that need to be broken are on pages 3, 6, and 9. We need to change the bin region on the code for each scaffold, like this:
 
@@ -421,9 +404,7 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    saveRDS(assembly_v2, file="assembly_v2.Rds") (1)
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | This will create a new file for the assembly. |
+   **1** | This will create a new file for the assembly. |
 5. Now we make the Hi-C map. Three files will be generated: a PDF with the intrachromosomal plots, a PDF with the interchromosomal plots, and a file to be loaded into R Shiny Map inspector (`*_export.Rds`).
 
    ```
@@ -494,9 +475,7 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    	cores=40, species="maize", nuc=snuc) -> hic_map_v2 (1)
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | Don’t forget to update assembly and Hi-C map versions. |
+   **1** | Don’t forget to update assembly and Hi-C map versions. |
 7. If another round of breaking scaffolds is needed, you can just run the previous block again. Don’t forget to change the output files and object names (assembly\_vX, hic\_map\_vX).
 8. If no more chimeras are found, proceed to decreasing the size to 500 kb.
 
@@ -518,9 +497,7 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
    write_hic_map(rds="hic_map_v3.Rds", file="hic_map_v3.xlsx", species="maize")
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | Don’t forget to put the correct object name here. |
+   **1** | Don’t forget to put the correct object name here. |
 
 ## 5. Manual curation of scaffolds
 
@@ -552,9 +529,7 @@ Now that we have the scaffolded assembly, we are going to check if there are any
    dev.off()
    ```
 
-   |  |  |
-   | --- | --- |
-   | **1** | Don’t forget to change objects' names. |
+   **1** | Don’t forget to change objects' names. |
 
 ### 5.2. Checking Hi-C maps
 
@@ -621,8 +596,6 @@ compile_psmol(fasta=fasta, output="pseudomolecules_v1",
 sink() (1)
 ```
 
-|  |  |
-| --- | --- |
-| **1** | That opens and closes a log file. |
+**1** | That opens and closes a log file. |
 
 Last updated 2022-12-15 15:16:29 +0100
