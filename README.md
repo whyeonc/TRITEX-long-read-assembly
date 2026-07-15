@@ -1,6 +1,6 @@
 # TRITEX long-read assembly pipeline
 
-Table of Contents
+**Contents**
 
 * Introduction
   + Installing the required tools
@@ -86,7 +86,7 @@ In case of questions on the pipeline, contact [Martin Mascher](mailto:mascher@ip
    3. The interactive R sessions for pseudomolecule construction hold large tables of Hi-C links in main memory. For a genome in size range of 5-15 Gb, 500 GB - 1 TB of main memory may be required.
       Some parts of the pseudomolecule construction are multithreaded (e.g. the `hic_map()` function),
       but savings in run time are negligeable, so running R on an allocation of 1 core will be just fine.
-6. Clone the Bitbucket [repository](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/src/master/) of the TRITEX assembly pipeline. The path to the local copy of the repository will be referenced by `$bitbucket` in the code listings.
+6. Clone the bitbucket script repository of the TRITEX assembly pipeline. The path to the local copy of the repository will be referenced by `$bitbucket` in the code listings.
 7. The scripts used below have parameters such as `--bedtools` or `--samtools` (indicated in the code listings) to specify the absolute paths to the required executables. For better readability, they are omitted from the commands.
 
 
