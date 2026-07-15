@@ -38,7 +38,6 @@ The TRITEX workflow can be broadly divided into two stages:
 
 
 <img width="2220" height="500" alt="tritex_overview" src="https://github.com/user-attachments/assets/aa5abc66-4efa-4e2e-962e-4869773ed3a0" />
-<img width="4267" height="2917" alt="manual_curation" src="https://github.com/user-attachments/assets/68223e01-7697-446c-8f19-8b90e687f10d" />
 Figure 1. Graphical overview of the TRITEX pipeline.
 
 The core algorithm for Hi-C map construction searches for a minimum spanning tree in the graph induced by Hi-C contact matrix and further refines it to include as many scaffolds as possible and to orient them relative to the chromosomal orientation of the guide map. The algorithm has been described in detail by [Beier *et al.* (2017)](https://doi.org/10.1038/sdata.2017.44:).
@@ -210,7 +209,7 @@ $map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $
 ### 3.1. If you already have a guide map
 
 1. Follow these steps if you already have a guide map. We are going to adjust it to the right format to be used in TRITEX.
-2. If you plan on using a reference genome to build a guide map, go to the [next section](#_if_you_are_using_a_reference_genome_to_create_the_guide_map).
+2. If you plan on using a reference genome to build a guide map, go to the next section.
 3. An example file is available [here](https://doi.org/10.5447/ipk/2022/20) (MaizeB73\_guidemap\_marker\_IBM.Rds).
 4. You will need a BED file with the genomic positions of your markers. The fourth column should contain IDs like "seq\_N", where N goes from 1 to the number of markers.
 5. Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.
