@@ -2,26 +2,24 @@
 
 Table of Contents
 
-* [Introduction](#_introduction)
-  + [Short-read TRITEX](#_short_read_tritex)
-  + [Installing the required tools](#_installing_the_required_tools)
-  + [Setting up the folder structure](#_setting_up_the_folder_structure)
-* [1. Obtaining the input contig assembly](#_obtaining_the_input_contig_assembly)
-* [2. Mapping Hi-C data](#_mapping_hi_c_data)
-* [3. Creating the guide map table](#_creating_the_guide_map_table)
-  + [3.1. If you already have a guide map](#_if_you_already_have_a_guide_map)
-  + [3.2. If you are using a reference genome to create the guide map](#_if_you_are_using_a_reference_genome_to_create_the_guide_map)
-  + [3.3. Mapping the guide map sequences to the genome](#_mapping_the_guide_map_sequences_to_the_genome)
-* [4. Creating the assembly object](#_creating_the_assembly_object)
-  + [4.1. Breaking chimeric scaffolds](#_breaking_chimeric_scaffolds)
-* [5. Manual curation of scaffolds](#_manual_curation_of_scaffolds)
-  + [5.1. Collinearity plots](#_collinearity_plots)
-  + [5.2. Checking Hi-C maps](#_checking_hi_c_maps)
-* [6. Compiling pseudomolecules](#_compiling_pseudomolecules)
+* Introduction
+  + Short-read TRITEX
+  + Installing the required tools
+  + Setting up the folder structure
+* 1. Obtaining the input contig assembly
+* 2. Mapping Hi-C data
+* 3. Creating the guide map table
+  + 3.1. If you already have a guide map
+  + 3.2. If you are using a reference genome to create the guide map
+  + 3.3. Mapping the guide map sequences to the genome
+* 4. Creating the assembly object
+  + 4.1. Breaking chimeric scaffolds
+* 5. Manual curation of scaffolds
+  + 5.1. Collinearity plots
+  + 5.2. Checking Hi-C maps
+* 6. Compiling pseudomolecules
 
 This is the documentation of TRITEX, a computational pipeline for chromosome-scale assembly of plant genomes. It was developed in the research group Domestication Genomics at the Leibniz Institute of Plant Genetics and Crop Research (IPK) Gatersleben.
-
-![logo](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/2787b4093a3bd79bf1170a7fbd312bb667ac8af9/logo.png)
 
 [Legal notice](https://www.ipk-gatersleben.de/en/imprint)
 
