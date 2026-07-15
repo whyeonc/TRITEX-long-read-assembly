@@ -37,7 +37,8 @@ The TRITEX workflow can be broadly divided into two stages:
 2. *Steps 4-6 of this tutorial.* Outputs of phase 1 are loaded into R to interactively create a TRITEX assembly object with tables listing Hi-C links and guide map alignment records.
 
 
-
+<img width="2220" height="500" alt="tritex_overview" src="https://github.com/user-attachments/assets/aa5abc66-4efa-4e2e-962e-4869773ed3a0" />
+<img width="4267" height="2917" alt="manual_curation" src="https://github.com/user-attachments/assets/68223e01-7697-446c-8f19-8b90e687f10d" />
 Figure 1. Graphical overview of the TRITEX pipeline.
 
 The core algorithm for Hi-C map construction searches for a minimum spanning tree in the graph induced by Hi-C contact matrix and further refines it to include as many scaffolds as possible and to orient them relative to the chromosomal orientation of the guide map. The algorithm has been described in detail by [Beier *et al.* (2017)](https://doi.org/10.1038/sdata.2017.44:).
@@ -565,8 +566,7 @@ Now that we have the scaffolded assembly, we are going to check if there are any
 3. You’ll want to check for inversions near scaffold borders (grey lines).
 4. When modifications are spotted, change the Excel file generated in the last steps. If an inverted contig is spotted, the column "new\_orientation" on the table must be changed (Fig. 2A). On the other hand, if there is a misplaced/extra contig, the row containing it should be move (don’t forget to change the bin number order) (Fig. 2B).
 
-![manual curation](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/manual_curation.jpg)
-
+<img width="4267" height="2917" alt="manual_curation" src="https://github.com/user-attachments/assets/0e97ce16-241f-491e-a8f7-adb5c5af0e7e" />
 Figure 2. Manual curation in the TRITEX’s correct-map-inspect cycle. **(A)** The Hi-C contacts show a pattern indicative of an inversion in the terminal contig. The orientation is swapped in the Excel table and a new Hi-C matrix is computed with the updated configuration. The revised Hi-C matrix has fewer off-diagonal signals. **(B)** Hi-C contacts show a pattern indicative of a misplaced contig. The order of the final two rows is reversed in the Excel table and the Hi-C matrix is computed with the new configuration. The revised Hi-C matrix has fewer off-diagonal signals.
 
 1. After making the changes, import the Excel file again and proceed with mapping.
