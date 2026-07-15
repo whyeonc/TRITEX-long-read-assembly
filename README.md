@@ -240,8 +240,8 @@ awk '$3 - $2 >= 100' $bed | grep -v chrUn | awk '{print $0"\tseq_"NR}' \
  | tee $out.bed | bedtools getfasta -fi $fa -bed /dev/stdin -name -fo $out.fasta
 ```
 
-**1** | You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`). |
-**2** | Use a reference assembly for the studied species. |
+| (1) | You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`). |
+| (2) | Use a reference assembly for the studied species. |
 
 1. Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.
 2. Now it is time to build the pseudo POPSEQ file (the guide map), which is used as input for the TRITEX pipeline.
