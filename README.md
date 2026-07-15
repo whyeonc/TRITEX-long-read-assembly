@@ -245,7 +245,7 @@ $map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $
 
 ### 3.2. If you are using a reference genome to create the guide map
 
-1. If you have a guide map available, you can skip this step and go to the [next section](#Pseudomolecule construction).
+1. If you have a guide map available, you can skip this step and go to the next section.
 2. In case you want to create a guide map from an available reference genome, first you need to obtain single-copy 100bp regions.
 
 ```
