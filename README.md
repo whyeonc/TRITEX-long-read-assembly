@@ -241,6 +241,7 @@ awk '$3 - $2 >= 100' $bed | grep -v chrUn | awk '{print $0"\tseq_"NR}' \
 ```
 
 > **①** You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`).
+> 
 > **②** Use a reference assembly for the studied species.
 
 1. Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.
