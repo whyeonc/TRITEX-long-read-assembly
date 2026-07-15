@@ -31,12 +31,12 @@ The purpose of the TRITEX long-read assembly pipeline is to build chromosome-sca
 
 TRITEX uses an input contig assembly (using [HiFi long-reads](https://www.nature.com/articles/s41587-019-0217-9), for example), Hi-C reads and a guide map to assemble the genomes within a short time frame. Manual curation of contig placements is done intuitively with user-editable tables and plots.
 
-The source code of the pipeline is open and hosted in a public Bitbucket [repository](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/src/master/).
 
 The TRITEX workflow can be broadly divided into two stages:
 
 1. *Steps 1-3 of this tutorial.* You will run shell scripts combining standard bioinformatics tools into pipelines for processing Hi-C reads and aligning guide map markers.
 2. *Steps 4-6 of this tutorial.* Outputs of phase 1 are loaded into R to interactively create a TRITEX assembly object with tables listing Hi-C links and guide map alignment records.
+
 
 
 Figure 1. Graphical overview of the TRITEX pipeline.
