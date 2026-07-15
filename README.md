@@ -21,6 +21,8 @@ Table of Contents
 
 This is the documentation of TRITEX, a computational pipeline for chromosome-scale assembly of plant genomes. It was developed in the research group Domestication Genomics at the Leibniz Institute of Plant Genetics and Crop Research (IPK) Gatersleben.
 
+<img width="862" height="269" alt="logo" src="https://github.com/user-attachments/assets/5d95e4bd-5261-4d8b-b4eb-3c8b14bd3401" />
+
 [Legal notice](https://www.ipk-gatersleben.de/en/imprint)
 
 ## Introduction
@@ -35,6 +37,7 @@ The TRITEX workflow can be broadly divided into two stages:
 
 1. *Steps 1-3 of this tutorial.* You will run shell scripts combining standard bioinformatics tools into pipelines for processing Hi-C reads and aligning guide map markers.
 2. *Steps 4-6 of this tutorial.* Outputs of phase 1 are loaded into R to interactively create a TRITEX assembly object with tables listing Hi-C links and guide map alignment records.
+
 
 ![tritex overview](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/tritex_overview.jpg)
 
