@@ -229,8 +229,8 @@ $map --threads 64 --mem '200G' --linker "GATCGATC" --ref $ref --bed $bed --tmp $
 2. In case you want to create a guide map from an available reference genome, first you need to obtain single-copy 100bp regions.
 
 ```
-mask='$bitbucket/miscellaneous/mask_assembly.zsh' (1)
-fa='$projectdir/reference_assembly.fasta' (2)
+mask='$bitbucket/miscellaneous/mask_assembly.zsh' ①
+fa='$projectdir/reference_assembly.fasta' ②
 bed="${fa:t:r}_masked_noGaps.bed"
 out="${fa:t:r}_singlecopy_100bp"
 
@@ -240,8 +240,8 @@ awk '$3 - $2 >= 100' $bed | grep -v chrUn | awk '{print $0"\tseq_"NR}' \
  | tee $out.bed | bedtools getfasta -fi $fa -bed /dev/stdin -name -fo $out.fasta
 ```
 
-**①** You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`). |
-| (2) | Use a reference assembly for the studied species. |
+**①** You need to specify the paths to the following executables: BBDuk (`bbduk`), fatotwobit (`bit`), twobitinfo (`tbinfo`), kmercountexact.sh (from BBMap) (`kmer`), SAMtools (`samtools`), and BEDTools (`bedtools`).
+**②** Use a reference assembly for the studied species.
 
 1. Most steps will be done in R from now on. If you are unsure whether a command should be pasted to the R or the shell prompt, hover with the mouse over the code listings. SH or R should appear in the top-right corner.
 2. Now it is time to build the pseudo POPSEQ file (the guide map), which is used as input for the TRITEX pipeline.
