@@ -2,7 +2,7 @@
 
 Table of Contents
 
-*Introduction
+* Introduction
   + Installing the required tools
   + Setting up the folder structure
 1. Obtaining the input contig assembly
