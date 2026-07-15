@@ -21,7 +21,7 @@ Table of Contents
 
 This is the documentation of TRITEX, a computational pipeline for chromosome-scale assembly of plant genomes. It was developed in the research group Domestication Genomics at the Leibniz Institute of Plant Genetics and Crop Research (IPK) Gatersleben.
 
-<img width="862" height="269" alt="logo" src="https://github.com/user-attachments/assets/5d95e4bd-5261-4d8b-b4eb-3c8b14bd3401" />
+<img width="431" height="135" alt="logo" src="https://github.com/user-attachments/assets/5d95e4bd-5261-4d8b-b4eb-3c8b14bd3401" />
 
 [Legal notice](https://www.ipk-gatersleben.de/en/imprint)
 
@@ -39,21 +39,12 @@ The TRITEX workflow can be broadly divided into two stages:
 2. *Steps 4-6 of this tutorial.* Outputs of phase 1 are loaded into R to interactively create a TRITEX assembly object with tables listing Hi-C links and guide map alignment records.
 
 
-![tritex overview](https://bitbucket.org/tritexassembly/tritexassembly.bitbucket.io/raw/9375957ff5f1763b1ce11d090919a76de9d7bf7a/tritex_overview.jpg)
-
 Figure 1. Graphical overview of the TRITEX pipeline.
 
 The core algorithm for Hi-C map construction searches for a minimum spanning tree in the graph induced by Hi-C contact matrix and further refines it to include as many scaffolds as possible and to orient them relative to the chromosomal orientation of the guide map. The algorithm has been described in detail by [Beier *et al.* (2017)](https://doi.org/10.1038/sdata.2017.44:).
 
 In case of questions on the pipeline, contact [Martin Mascher](mailto:mascher@ipk-gatersleben.de).
 
-### Short-read TRITEX
-
-The previous version of TRITEX used short-read data.
-
-The old version of this tutorial is available [here](https://tritexassembly.bitbucket.io/deprecated_files).
-
-See also the first TRITEX [paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1899-5).
 
 ### Installing the required tools
 
