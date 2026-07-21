@@ -465,13 +465,13 @@ $minimap -t $threads -2 -I $size -K$mem -x asm5 $ref $qry | bgzip > $prefix.paf.
 
    hic_map(info=hic_info, assembly=assembly_v3, frags=frag_data$bed,
    	species="maize", ncores=40, min_nfrag_scaffold=30, max_cM_dist = 1000,
-   	binsize=2e5, min_nfrag_bin=10, gap_size=100) -> hic_map_v2 ①
+   	binsize=2e5, min_nfrag_bin=10, gap_size=100) -> hic_map_v2 
 
-   saveRDS(hic_map_v2, file="hic_map_v2.Rds") ①
+   saveRDS(hic_map_v2, file="hic_map_v2.Rds") 
 
    snuc <- '$projectdir/assembly/project_name.p_ctg_MboI_fragments_30bp_split.nuc.txt'
    hic_plots(rds="hic_map_v2.Rds", assembly=assembly_v3,
-   	cores=40, species="maize", nuc=snuc) -> hic_map_v2 ①
+   	cores=40, species="maize", nuc=snuc) -> hic_map_v2 
    ```
 
 7. If another round of breaking scaffolds is needed, you can just run the previous block again. Don’t forget to change the output files and object names (assembly\_vX, hic\_map\_vX).
